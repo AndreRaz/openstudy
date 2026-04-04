@@ -137,11 +137,11 @@ export namespace Installation {
         )
 
         const getBrewFormula = Effect.fnUntraced(function* () {
-          const tapFormula = yield* text(["brew", "list", "--formula", "anomalyco/tap/opencode"])
-          if (tapFormula.includes("opencode")) return "anomalyco/tap/opencode"
-          const coreFormula = yield* text(["brew", "list", "--formula", "opencode"])
-          if (coreFormula.includes("opencode")) return "opencode"
-          return "opencode"
+          const tapFormula = yield* text(["brew", "list", "--formula", "anomalyco/tap/openstudy"])
+          if (tapFormula.includes("openstudy")) return "anomalyco/tap/openstudy"
+          const coreFormula = yield* text(["brew", "list", "--formula", "openstudy"])
+          if (coreFormula.includes("openstudy")) return "openstudy"
+          return "openstudy"
         })
 
         const upgradeCurl = Effect.fnUntraced(
@@ -176,9 +176,9 @@ export namespace Installation {
             { name: "yarn", command: () => text(["yarn", "global", "list"]) },
             { name: "pnpm", command: () => text(["pnpm", "list", "-g", "--depth=0"]) },
             { name: "bun", command: () => text(["bun", "pm", "ls", "-g"]) },
-            { name: "brew", command: () => text(["brew", "list", "--formula", "opencode"]) },
-            { name: "scoop", command: () => text(["scoop", "list", "opencode"]) },
-            { name: "choco", command: () => text(["choco", "list", "--limit-output", "opencode"]) },
+            { name: "brew", command: () => text(["brew", "list", "--formula", "openstudy"]) },
+            { name: "scoop", command: () => text(["scoop", "list", "openstudy"]) },
+            { name: "choco", command: () => text(["choco", "list", "--limit-output", "openstudy"]) },
           ]
 
           checks.sort((a, b) => {
@@ -192,7 +192,7 @@ export namespace Installation {
           for (const check of checks) {
             const output = yield* check.command()
             const installedName =
-              check.name === "brew" || check.name === "choco" || check.name === "scoop" ? "opencode" : "opencode-ai"
+              check.name === "brew" || check.name === "choco" || check.name === "scoop" ? "openstudy" : "opencode-ai"
             if (output.includes(installedName)) {
               return check.name
             }
@@ -268,13 +268,13 @@ export namespace Installation {
               result = yield* upgradeCurl(target)
               break
             case "npm":
-              result = yield* run(["npm", "install", "-g", `opencode-ai@${target}`])
+              result = yield* run(["npm", "install", "-g", `openstudy@${target}`])
               break
             case "pnpm":
-              result = yield* run(["pnpm", "install", "-g", `opencode-ai@${target}`])
+              result = yield* run(["pnpm", "install", "-g", `openstudy@${target}`])
               break
             case "bun":
-              result = yield* run(["bun", "install", "-g", `opencode-ai@${target}`])
+              result = yield* run(["bun", "install", "-g", `openstudy@${target}`])
               break
             case "brew": {
               const formula = yield* getBrewFormula()
@@ -299,10 +299,10 @@ export namespace Installation {
               break
             }
             case "choco":
-              result = yield* run(["choco", "upgrade", "opencode", `--version=${target}`, "-y"])
+              result = yield* run(["choco", "upgrade", "openstudy", `--version=${target}`, "-y"])
               break
             case "scoop":
-              result = yield* run(["scoop", "install", `opencode@${target}`])
+              result = yield* run(["scoop", "install", `openstudy@${target}`])
               break
             default:
               return yield* new UpgradeFailedError({ stderr: `Unknown method: ${m}` })

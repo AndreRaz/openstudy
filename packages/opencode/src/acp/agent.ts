@@ -536,8 +536,8 @@ export namespace ACP {
       log.info("initialize", { protocolVersion: params.protocolVersion })
 
       const authMethod: AuthMethod = {
-        description: "Run `opencode auth login` in the terminal",
-        name: "Login with opencode",
+        description: "Run `openstudy auth login` in the terminal",
+        name: "Login with openstudy",
         id: "opencode-login",
       }
 
@@ -545,9 +545,9 @@ export namespace ACP {
       if (params.clientCapabilities?._meta?.["terminal-auth"] === true) {
         authMethod._meta = {
           "terminal-auth": {
-            command: "opencode",
+            command: "openstudy",
             args: ["auth", "login"],
-            label: "OpenCode Login",
+            label: "OpenStudy Login",
           },
         }
       }
@@ -572,7 +572,7 @@ export namespace ACP {
         },
         authMethods: [authMethod],
         agentInfo: {
-          name: "OpenCode",
+          name: "OpenStudy",
           version: Installation.VERSION,
         },
       }

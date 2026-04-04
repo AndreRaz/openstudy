@@ -165,9 +165,9 @@ export namespace Server {
         openAPIRouteHandler(app, {
           documentation: {
             info: {
-              title: "opencode",
+              title: "openstudy",
               version: "0.0.3",
-              description: "opencode api",
+              description: "openstudy api",
             },
             openapi: "3.1.1",
           },
@@ -251,9 +251,9 @@ export namespace Server {
     const result = await generateSpecs(app, {
       documentation: {
         info: {
-          title: "opencode",
+          title: "openstudy",
           version: "1.0.0",
-          description: "opencode api",
+          description: "openstudy api",
         },
         openapi: "3.1.1",
       },
