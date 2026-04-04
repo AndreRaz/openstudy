@@ -87,6 +87,28 @@ jobs:
 
             def install
               bin.install "openstudy"
+              bin.install "setup-openstudy.sh" if File.exist?("setup-openstudy.sh")
+            end
+
+            def post_install
+              setup = bin/"setup-openstudy.sh"
+              system setup.to_s if setup.exist?
+            end
+
+            def caveats
+              <<~EOS
+                OpenStudy ha sido instalado con 4 agentes académicos:
+                  • Neux Profesor     — tutorías, resúmenes, flashcards, exámenes
+                  • Neux Tutor        — retroalimentación y análisis
+                  • Neux Investigador — investigación académica profunda
+                  • Neux Explorador   — navegación de archivos de estudio
+
+                Necesitas configurar una API key:
+                  openstudy providers login
+
+                Para empezar:
+                  openstudy
+              EOS
             end
 
             test do

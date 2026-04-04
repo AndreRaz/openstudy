@@ -76,20 +76,20 @@ jobs:
         if: matrix.pack == 'tar'
         shell: bash
         run: |
-          tar -czf ${{ matrix.artifact }} -C "${{ steps.dist.outputs.dir }}" openstudy
+          tar -czf ${{ matrix.artifact }} -C "${{ steps.dist.outputs.dir }}" openstudy setup-openstudy.sh
 
       - name: Package (zip - unix)
         if: matrix.pack == 'zip' && matrix.platform != 'windows'
         shell: bash
         run: |
-          cd "${{ steps.dist.outputs.dir }}" && zip "$GITHUB_WORKSPACE/${{ matrix.artifact }}" openstudy
+          cd "${{ steps.dist.outputs.dir }}" && zip "$GITHUB_WORKSPACE/${{ matrix.artifact }}" openstudy setup-openstudy.sh
 
       - name: Package (zip - windows)
         if: matrix.platform == 'windows'
         shell: pwsh
         run: |
           $binDir = "${{ steps.dist.outputs.dir }}"
-          Compress-Archive -Path "$binDir\openstudy.exe" -DestinationPath "${{ matrix.artifact }}"
+          Compress-Archive -Path "$binDir\openstudy.exe", "$binDir\setup-openstudy.sh" -DestinationPath "${{ matrix.artifact }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
