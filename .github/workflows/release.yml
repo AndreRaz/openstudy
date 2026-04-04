@@ -76,20 +76,20 @@ jobs:
         if: matrix.pack == 'tar'
         shell: bash
         run: |
-          tar -czf ${{ matrix.artifact }} -C "${{ steps.dist.outputs.dir }}" openstudy setup-openstudy.sh
+          tar -czf ${{ matrix.artifact }} -C "${{ steps.dist.outputs.dir }}" openstudy setup-openstudy.sh setup-openstudy.ps1 setup-openstudy.cmd
 
       - name: Package (zip - unix)
         if: matrix.pack == 'zip' && matrix.platform != 'windows'
         shell: bash
         run: |
-          cd "${{ steps.dist.outputs.dir }}" && zip "$GITHUB_WORKSPACE/${{ matrix.artifact }}" openstudy setup-openstudy.sh
+          cd "${{ steps.dist.outputs.dir }}" && zip "$GITHUB_WORKSPACE/${{ matrix.artifact }}" openstudy setup-openstudy.sh setup-openstudy.ps1 setup-openstudy.cmd
 
       - name: Package (zip - windows)
         if: matrix.platform == 'windows'
         shell: pwsh
         run: |
           $binDir = "${{ steps.dist.outputs.dir }}"
-          Compress-Archive -Path "$binDir\openstudy.exe", "$binDir\setup-openstudy.sh" -DestinationPath "${{ matrix.artifact }}"
+          Compress-Archive -Path "$binDir\openstudy.exe", "$binDir\setup-openstudy.ps1", "$binDir\setup-openstudy.cmd" -DestinationPath "${{ matrix.artifact }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -119,6 +119,16 @@ jobs:
         run: |
           sha256sum openstudy-* > SHA256SUMS.txt
           cat SHA256SUMS.txt
+
+      - name: Ensure release exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+          gh release create "$GITHUB_REF_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "OpenStudy ${GITHUB_REF_NAME}" \
+            --notes "Automated release for ${GITHUB_REF_NAME}"
 
       - name: Upload to GitHub Release
         env:

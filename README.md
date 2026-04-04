@@ -79,6 +79,17 @@ unzip openstudy.zip && chmod +x openstudy
 ./openstudy
 ```
 
+### Configuración inicial en Windows
+
+Después de descomprimir `openstudy-windows-x64.zip`, ejecuta:
+
+```powershell
+./setup-openstudy.cmd
+openstudy.exe
+```
+
+Eso instala globalmente los 4 agentes académicos en tu configuración de usuario.
+
 ### Desde el código fuente
 
 ```bash

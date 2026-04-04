@@ -249,9 +249,17 @@ for (const item of targets) {
 
   await $`rm -rf ./dist/${name}/bin/tui`
   // Include setup script alongside the binary
-  const setupSrc = path.join(dir, "setup-openstudy.sh")
-  if (fs.existsSync(setupSrc)) {
-    await $`cp ${setupSrc} dist/${name}/bin/setup-openstudy.sh`
+  const setupSh = path.join(dir, "setup-openstudy.sh")
+  const setupPs1 = path.join(dir, "setup-openstudy.ps1")
+  const setupCmd = path.join(dir, "setup-openstudy.cmd")
+  if (fs.existsSync(setupSh)) {
+    await $`cp ${setupSh} dist/${name}/bin/setup-openstudy.sh`
+  }
+  if (fs.existsSync(setupPs1)) {
+    await $`cp ${setupPs1} dist/${name}/bin/setup-openstudy.ps1`
+  }
+  if (fs.existsSync(setupCmd)) {
+    await $`cp ${setupCmd} dist/${name}/bin/setup-openstudy.cmd`
   }
   await Bun.file(`dist/${name}/package.json`).write(
     JSON.stringify(
