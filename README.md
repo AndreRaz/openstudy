@@ -48,26 +48,34 @@ Todos los agentes responden en **español** por defecto y siguen principios de i
 
 - Una API key de un proveedor de IA (Anthropic recomendado)
 
-### Homebrew (recomendado — Linux)
+### Homebrew (macOS y Linux)
 
 ```bash
 brew install AndreRaz/tap/openstudy
-```
-
-Después de instalar, ejecuta:
-
-```bash
 openstudy
 ```
 
 ### Descarga directa
 
-Descarga el binario desde la [página de releases](https://github.com/AndreRaz/openstudy/releases):
+Descarga el binario para tu plataforma desde la [página de releases](https://github.com/AndreRaz/openstudy/releases):
+
+| Plataforma | Asset |
+|------------|-------|
+| macOS (Apple Silicon) | `openstudy-darwin-arm64.zip` |
+| macOS (Intel) | `openstudy-darwin-x64.zip` |
+| Linux x64 | `openstudy-linux-x64.tar.gz` |
+| Linux ARM64 | `openstudy-linux-arm64.tar.gz` |
+| Windows x64 | `openstudy-windows-x64.zip` |
 
 ```bash
-# Linux x64
-curl -fsSL https://github.com/AndreRaz/openstudy/releases/download/v1.0.0/openstudy-linux-x64.tar.gz | tar xz
+# Ejemplo: Linux x64
+curl -fsSL https://github.com/AndreRaz/openstudy/releases/latest/download/openstudy-linux-x64.tar.gz | tar xz
 chmod +x openstudy
+./openstudy
+
+# Ejemplo: macOS Apple Silicon
+curl -fsSL https://github.com/AndreRaz/openstudy/releases/latest/download/openstudy-darwin-arm64.zip -o openstudy.zip
+unzip openstudy.zip && chmod +x openstudy
 ./openstudy
 ```
 
