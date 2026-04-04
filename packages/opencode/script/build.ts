@@ -264,7 +264,7 @@ for (const item of targets) {
   // Include global skills alongside the binary
   const skillsSrc = path.join(dir, "skills")
   if (fs.existsSync(skillsSrc)) {
-    await $`cp -r ${skillsSrc} dist/${name}/bin/skills`
+    fs.cpSync(skillsSrc, path.join(dir, `dist/${name}/bin/skills`), { recursive: true })
   }
   await Bun.file(`dist/${name}/package.json`).write(
     JSON.stringify(
