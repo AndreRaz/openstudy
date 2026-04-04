@@ -3,10 +3,8 @@ set -euo pipefail
 
 REPO="AndreRaz/openstudy"
 INSTALL_DIR="${OPENSTUDY_INSTALL_DIR:-${XDG_BIN_DIR:-$HOME/.local/bin}}"
-NPM_PREFIX="${OPENSTUDY_NPM_PREFIX:-$HOME/.openstudy/npm}"
 TMP_DIR="$(mktemp -d)"
-NODE_MCPS_INSTALLED=0
-NODE_MCPS_MISSING=0
+NPM_AVAILABLE=0
 
 cleanup() {
   rm -rf "$TMP_DIR"
@@ -133,42 +131,18 @@ PY
   fi
 }
 
-link_npm_bin() {
-  local src="$1"
-  local target="$2"
-  if [ -f "$src" ]; then
-    ln -sf "$src" "$target"
-  fi
-}
-
-install_node_mcps() {
-  if ! has npm; then
-    NODE_MCPS_MISSING=1
-    echo "📦 npm no está disponible. OpenStudy sí se instalará, PERO faltarán estos MCPs:"
-    echo "   - filesystem"
-    echo "   - notion"
-    echo "   - notebooklm"
-    echo ""
-    echo "   Instala Node.js (incluye npm) y vuelve a ejecutar este instalador:"
+check_npm() {
+  if has npm; then
+    NPM_AVAILABLE=1
+  else
+    echo "⚠️  npm no encontrado. Los MCPs (filesystem, notion, notebooklm) usan 'npx' y"
+    echo "   se descargarán automáticamente al primer uso. Instala Node.js para activarlos:"
     echo "   https://nodejs.org/"
-    return
   fi
-
-  echo "📦 Instalando MCPs de Node.js (filesystem, notion, notebooklm)..."
-  mkdir -p "$NPM_PREFIX"
-  npm install -g --prefix "$NPM_PREFIX" @modelcontextprotocol/server-filesystem notion-mcp-server notebooklm-mcp >/dev/null
-
-  mkdir -p "$INSTALL_DIR"
-  link_npm_bin "$NPM_PREFIX/bin/mcp-server-filesystem" "$INSTALL_DIR/mcp-server-filesystem"
-  link_npm_bin "$NPM_PREFIX/bin/notion-mcp-server" "$INSTALL_DIR/notion-mcp-server"
-  link_npm_bin "$NPM_PREFIX/bin/notebooklm-mcp" "$INSTALL_DIR/notebooklm-mcp"
-
-  NODE_MCPS_INSTALLED=1
-  echo "  ✓ MCPs npm instalados"
 }
 
 install_engram
-install_node_mcps
+check_npm
 
 if [ -f "$TMP_DIR/setup-openstudy.sh" ]; then
   chmod +x "$TMP_DIR/setup-openstudy.sh"
@@ -181,15 +155,13 @@ echo
 echo "Si '$INSTALL_DIR' no está en tu PATH, agrega esto a tu shell:"
 echo "  export PATH=\"$INSTALL_DIR:\$PATH\""
 echo
-if [ "$NODE_MCPS_INSTALLED" -eq 1 ]; then
-  echo "MCPs configurados: filesystem, engram, notion, notebooklm"
-elif [ "$NODE_MCPS_MISSING" -eq 1 ]; then
-  echo "MCPs configurados: engram"
-  echo "MCPs pendientes por instalar cuando tengas npm: filesystem, notion, notebooklm"
+if [ "$NPM_AVAILABLE" -eq 1 ]; then
+  echo "MCPs activos: filesystem, engram, notion, notebooklm (vía npx)"
 else
-  echo "MCPs configurados: engram"
+  echo "MCPs activos: engram"
+  echo "MCPs pendientes (requieren Node.js): filesystem, notion, notebooklm"
 fi
-echo "Variables recomendadas: NOTION_TOKEN, NOTEBOOKLM_PROFILE"
+echo "Variables opcionales: NOTION_TOKEN, NOTEBOOKLM_PROFILE"
 echo
 echo "Siguiente paso:"
 echo "  openstudy providers login"

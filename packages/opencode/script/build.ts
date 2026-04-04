@@ -261,6 +261,11 @@ for (const item of targets) {
   if (fs.existsSync(setupCmd)) {
     await $`cp ${setupCmd} dist/${name}/bin/setup-openstudy.cmd`
   }
+  // Include global skills alongside the binary
+  const skillsSrc = path.join(dir, "skills")
+  if (fs.existsSync(skillsSrc)) {
+    await $`cp -r ${skillsSrc} dist/${name}/bin/skills`
+  }
   await Bun.file(`dist/${name}/package.json`).write(
     JSON.stringify(
       {

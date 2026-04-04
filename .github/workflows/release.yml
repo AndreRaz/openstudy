@@ -76,20 +76,29 @@ jobs:
         if: matrix.pack == 'tar'
         shell: bash
         run: |
-          tar -czf ${{ matrix.artifact }} -C "${{ steps.dist.outputs.dir }}" openstudy setup-openstudy.sh setup-openstudy.ps1 setup-openstudy.cmd
+          DIST="${{ steps.dist.outputs.dir }}"
+          ITEMS=(openstudy setup-openstudy.sh setup-openstudy.ps1 setup-openstudy.cmd)
+          [ -d "$DIST/skills" ] && ITEMS+=(skills)
+          tar -czf ${{ matrix.artifact }} -C "$DIST" "${ITEMS[@]}"
 
       - name: Package (zip - unix)
         if: matrix.pack == 'zip' && matrix.platform != 'windows'
         shell: bash
         run: |
-          cd "${{ steps.dist.outputs.dir }}" && zip "$GITHUB_WORKSPACE/${{ matrix.artifact }}" openstudy setup-openstudy.sh setup-openstudy.ps1 setup-openstudy.cmd
+          DIST="${{ steps.dist.outputs.dir }}"
+          cd "$DIST"
+          ITEMS=(openstudy setup-openstudy.sh setup-openstudy.ps1 setup-openstudy.cmd)
+          [ -d "skills" ] && ITEMS+=(skills)
+          zip -r "$GITHUB_WORKSPACE/${{ matrix.artifact }}" "${ITEMS[@]}"
 
       - name: Package (zip - windows)
         if: matrix.platform == 'windows'
         shell: pwsh
         run: |
           $binDir = "${{ steps.dist.outputs.dir }}"
-          Compress-Archive -Path "$binDir\openstudy.exe", "$binDir\setup-openstudy.ps1", "$binDir\setup-openstudy.cmd" -DestinationPath "${{ matrix.artifact }}"
+          $items = @("$binDir\openstudy.exe", "$binDir\setup-openstudy.ps1", "$binDir\setup-openstudy.cmd")
+          if (Test-Path "$binDir\skills") { $items += "$binDir\skills" }
+          Compress-Archive -Path $items -DestinationPath "${{ matrix.artifact }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

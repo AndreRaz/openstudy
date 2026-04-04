@@ -31,14 +31,29 @@ No es una herramienta de programación. No es un asistente de código. Es un tut
 
 OpenStudy incluye 4 agentes especializados. Cada uno tiene un propósito claro:
 
-| Agente | Comando | Qué hace |
-|--------|---------|----------|
-| **Neux Profesor** | `Tab` (default) | Tutorías, resúmenes, flashcards, exámenes de práctica, mapas conceptuales |
-| **Neux Tutor** | `Tab` | Retroalimentación sobre tu material — análisis y diagnóstico (solo lectura) |
+| Agente | Cómo invocarlo | Qué hace |
+|--------|----------------|----------|
+| **Neux Profesor** | agente por defecto | Tutorías, resúmenes, flashcards, exámenes de práctica, mapas conceptuales |
+| **Neux Tutor** | `@neux-tutor` | Retroalimentación sobre tu material — análisis y diagnóstico (solo lectura) |
 | **Neux Investigador** | `@neux-investigador` | Investigación académica profunda con bibliografía estructurada |
 | **Neux Explorador** | `@neux-explorador` | Navegación de tus archivos de estudio en tu computadora |
 
 Todos los agentes responden en **español** por defecto y siguen principios de integridad académica.
+
+---
+
+## Skills Académicas
+
+Las skills son capacidades especializadas que se activan con `/` dentro de cualquier sesión. Se instalan automáticamente en tu configuración global.
+
+| Skill | Comando | Para qué sirve |
+|-------|---------|----------------|
+| **Exploración** | `/estudio-explorar` | Mapea conceptos, fuentes y debates antes de estudiar un tema nuevo |
+| **Redacción** | `/redaccion` | Guía para escribir ensayos, informes y trabajos universitarios |
+| **Matemáticas** | `/matematicas` | Resuelve problemas paso a paso con explicación de cada concepto |
+| **Resumen** | `/resumen` | Sintetiza textos, apuntes o capítulos con jerarquía de ideas |
+| **Flashcards** | `/flashcards` | Genera tarjetas de repaso espaciado desde cualquier material |
+| **Plan de estudio** | `/plan-estudio` | Crea un cronograma realista para exámenes o materias completas |
 
 ---
 
@@ -48,7 +63,7 @@ Todos los agentes responden en **español** por defecto y siguen principios de i
 
 - Una API key de un proveedor de IA (Anthropic recomendado)
 - **Windows:** PowerShell 5+ o PowerShell 7+
-- **Opcional pero recomendado:** Node.js + `npm` si quieres que también se instalen automáticamente los MCPs de `filesystem`, `notion` y `notebooklm`
+- **Recomendado:** Node.js (incluye `npm` y `npx`) para que funcionen los MCPs de `filesystem`, `notion` y `notebooklm`
 
 ### Homebrew (macOS y Linux)
 
@@ -59,7 +74,7 @@ openstudy
 
 ### Instalación rápida — un comando
 
-Esta es la forma recomendada para la mayoría de usuarios. Descarga OpenStudy, instala Engram si hace falta e intenta dejar configurados los MCPs principales.
+Esta es la forma recomendada para la mayoría de usuarios. Un solo comando deja todo configurado.
 
 **macOS / Linux**
 
@@ -73,20 +88,15 @@ curl -fsSL https://raw.githubusercontent.com/AndreRaz/openstudy/dev/script/insta
 irm https://raw.githubusercontent.com/AndreRaz/openstudy/dev/script/install.ps1 | iex
 ```
 
-Después de correrlo, el instalador:
+El instalador hace todo esto automáticamente:
 
-- descarga `openstudy.exe`
-- intenta instalar **Engram** automáticamente
-- intenta instalar **filesystem MCP**, **Notion MCP** y **NotebookLM MCP** si detecta `npm`
-- ejecuta la configuración inicial de OpenStudy
+- Descarga e instala el binario de **OpenStudy**
+- Instala **Engram** (memoria persistente) si no está presente
+- Configura los **agentes académicos** (Neux Profesor, Tutor, Investigador, Explorador)
+- Instala las **6 skills académicas** globalmente (redacción, matemáticas, resumen, flashcards, plan de estudio, exploración)
+- Configura los **MCPs** en `~/.config/opencode/opencode.json` usando `npx` — no requiere instalación previa de paquetes npm
 
-> Si PowerShell bloquea el comando por políticas de seguridad, abre una terminal como usuario normal y vuelve a intentarlo. Si usas una política corporativa muy restrictiva, descarga el script manualmente y revísalo antes de ejecutarlo.
-
-El instalador intenta dejarte listo también el ecosistema MCP:
-
-- instala **Engram** automáticamente si no existe
-- instala **filesystem MCP**, **Notion MCP** y **NotebookLM MCP** automáticamente si detecta `npm`
-- configura los MCPs en `~/.config/opencode/opencode.json`
+> **Windows**: Si PowerShell bloquea el script por políticas de seguridad, abre una nueva terminal como usuario normal y vuelve a intentarlo.
 
 ### Primer uso después de instalar
 
@@ -176,18 +186,12 @@ OpenStudy viene preconfigurado con herramientas que potencian a los agentes:
 
 | Herramienta | Qué hace | Requisito |
 |-------------|----------|-----------|
-| **Filesystem** | Permite a los agentes leer tus archivos de estudio | Se instala automáticamente si hay `npm` |
-| **Engram** | Memoria persistente — el agente recuerda entre sesiones | El instalador intenta instalarlo automáticamente |
-| **Notion** | Consulta y automatización sobre tu workspace de Notion | Requiere `NOTION_TOKEN` |
-| **NotebookLM** | Consulta tus notebooks de Google NotebookLM directamente | Requiere login con Google (una sola vez) |
+| **Filesystem** | Permite a los agentes leer tus archivos de estudio | Node.js (se ejecuta vía `npx`, sin instalación manual) |
+| **Engram** | Memoria persistente — el agente recuerda entre sesiones | El instalador lo instala automáticamente |
+| **Notion** | Consulta y automatización sobre tu workspace de Notion | Node.js + variable `NOTION_TOKEN` |
+| **NotebookLM** | Consulta tus notebooks de Google NotebookLM directamente | Node.js + login con Google (una sola vez) |
 
-### Nota sobre instalación automática de MCPs
-
-OpenStudy intenta instalar estos MCPs durante la instalación principal. Si alguno no queda disponible:
-
-- vuelve a correr el instalador
-- asegúrate de tener `npm` instalado para los MCPs de Node.js
-- exporta `NOTION_TOKEN` para Notion
+Los MCPs de Node.js usan `npx` internamente: no requieren instalación global previa. Si Node.js está instalado, funcionan desde el primer uso. Si no está instalado, solo Engram estará activo — el resto se activa en cuanto instales Node.js.
 
 ### Instalar Engram manualmente (si hace falta)
 
@@ -244,19 +248,30 @@ OpenStudy está construido sobre la arquitectura de [opencode](https://github.co
 ```
 openstudy/
 ├── .opencode/
-│   ├── agents/          # Agentes académicos (Markdown)
-│   └── skills/          # Skills de estudio académico
+│   └── skills/                  # Skills de desarrollo del proyecto (dev)
 ├── packages/
-│   ├── opencode/        # Core: CLI + TUI + motor de agentes
-│   ├── app/             # App web (Astro)
-│   ├── desktop/         # App escritorio (Tauri)
-│   ├── desktop-electron/# App escritorio (Electron)
-│   ├── ui/              # Componentes UI compartidos
-│   └── web/             # Landing page
-├── AGENTS.md            # Contrato global de agentes académicos
-├── opencode.json        # Configuración de agentes y MCPs
-└── PRD.md               # Documento de requerimientos del producto
+│   ├── opencode/                # Core: CLI + TUI + motor de agentes
+│   │   └── skills/              # Skills académicas distribuidas con el instalador
+│   │       ├── estudio-explorar/
+│   │       ├── redaccion/
+│   │       ├── matematicas/
+│   │       ├── resumen/
+│   │       ├── flashcards/
+│   │       └── plan-estudio/
+│   ├── app/                     # App web (Astro)
+│   ├── desktop/                 # App escritorio (Tauri)
+│   ├── desktop-electron/        # App escritorio (Electron)
+│   ├── ui/                      # Componentes UI compartidos
+│   └── web/                     # Landing page
+├── script/
+│   ├── install.sh               # Instalador macOS/Linux
+│   └── install.ps1              # Instalador Windows
+├── AGENTS.md                    # Contrato global de agentes académicos
+├── opencode.json                # Configuración de agentes y MCPs
+└── PRD.md                       # Documento de requerimientos del producto
 ```
+
+Al instalar, las skills se copian a `~/.config/opencode/skills/` y quedan disponibles globalmente.
 
 ---
 
