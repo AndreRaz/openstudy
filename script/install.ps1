@@ -4,6 +4,8 @@ $Repo = 'AndreRaz/openstudy'
 $InstallDir = if ($env:OPENSTUDY_INSTALL_DIR) { $env:OPENSTUDY_INSTALL_DIR } else { Join-Path $HOME '.local\bin' }
 $NpmPrefix = if ($env:OPENSTUDY_NPM_PREFIX) { $env:OPENSTUDY_NPM_PREFIX } else { Join-Path $HOME '.openstudy\npm' }
 $TmpDir = Join-Path ([System.IO.Path]::GetTempPath()) ("openstudy-install-" + [guid]::NewGuid().ToString())
+$NodeMcpsInstalled = $false
+$NodeMcpsMissing = $false
 
 function Has-Command($Name) {
   return [bool](Get-Command $Name -ErrorAction SilentlyContinue)
@@ -65,8 +67,16 @@ try {
         Copy-Item $src (Join-Path $InstallDir $ps1) -Force
       }
     }
+    $NodeMcpsInstalled = $true
   } else {
-    Write-Host '📦 npm no está disponible. Se omite instalación automática de filesystem/notion/notebooklm MCP.' -ForegroundColor Yellow
+    $NodeMcpsMissing = $true
+    Write-Host '📦 npm no está disponible. OpenStudy sí se instalará, PERO faltarán estos MCPs:' -ForegroundColor Yellow
+    Write-Host '   - filesystem' -ForegroundColor Yellow
+    Write-Host '   - notion' -ForegroundColor Yellow
+    Write-Host '   - notebooklm' -ForegroundColor Yellow
+    Write-Host ''
+    Write-Host '   Instala Node.js (incluye npm) y vuelve a ejecutar este instalador:' -ForegroundColor Yellow
+    Write-Host '   https://nodejs.org/' -ForegroundColor Yellow
   }
 
   if (Test-Path (Join-Path $TmpDir 'setup-openstudy.ps1')) {
@@ -76,7 +86,14 @@ try {
   Write-Host ''
   Write-Host "✅ OpenStudy instalado en: $InstallDir\openstudy.exe" -ForegroundColor Green
   Write-Host ''
-  Write-Host 'MCPs configurados: filesystem, engram, notion, notebooklm'
+  if ($NodeMcpsInstalled) {
+    Write-Host 'MCPs configurados: filesystem, engram, notion, notebooklm'
+  } elseif ($NodeMcpsMissing) {
+    Write-Host 'MCPs configurados: engram'
+    Write-Host 'MCPs pendientes por instalar cuando tengas npm: filesystem, notion, notebooklm' -ForegroundColor Yellow
+  } else {
+    Write-Host 'MCPs configurados: engram'
+  }
   Write-Host 'Variables recomendadas: NOTION_TOKEN, NOTEBOOKLM_PROFILE'
   Write-Host 'Si ese directorio no está en tu PATH, agrégalo a tus variables de entorno.'
   Write-Host 'Siguiente paso:'

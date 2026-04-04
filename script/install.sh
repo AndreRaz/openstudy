@@ -5,6 +5,8 @@ REPO="AndreRaz/openstudy"
 INSTALL_DIR="${OPENSTUDY_INSTALL_DIR:-${XDG_BIN_DIR:-$HOME/.local/bin}}"
 NPM_PREFIX="${OPENSTUDY_NPM_PREFIX:-$HOME/.openstudy/npm}"
 TMP_DIR="$(mktemp -d)"
+NODE_MCPS_INSTALLED=0
+NODE_MCPS_MISSING=0
 
 cleanup() {
   rm -rf "$TMP_DIR"
@@ -141,8 +143,14 @@ link_npm_bin() {
 
 install_node_mcps() {
   if ! has npm; then
-    echo "📦 npm no está disponible. Se omite instalación automática de filesystem/notion/notebooklm MCP."
-    echo "   Instálalos luego con Node.js + npm y vuelve a correr el instalador si quieres."
+    NODE_MCPS_MISSING=1
+    echo "📦 npm no está disponible. OpenStudy sí se instalará, PERO faltarán estos MCPs:"
+    echo "   - filesystem"
+    echo "   - notion"
+    echo "   - notebooklm"
+    echo ""
+    echo "   Instala Node.js (incluye npm) y vuelve a ejecutar este instalador:"
+    echo "   https://nodejs.org/"
     return
   fi
 
@@ -155,6 +163,7 @@ install_node_mcps() {
   link_npm_bin "$NPM_PREFIX/bin/notion-mcp-server" "$INSTALL_DIR/notion-mcp-server"
   link_npm_bin "$NPM_PREFIX/bin/notebooklm-mcp" "$INSTALL_DIR/notebooklm-mcp"
 
+  NODE_MCPS_INSTALLED=1
   echo "  ✓ MCPs npm instalados"
 }
 
@@ -172,7 +181,14 @@ echo
 echo "Si '$INSTALL_DIR' no está en tu PATH, agrega esto a tu shell:"
 echo "  export PATH=\"$INSTALL_DIR:\$PATH\""
 echo
-echo "MCPs configurados: filesystem, engram, notion, notebooklm"
+if [ "$NODE_MCPS_INSTALLED" -eq 1 ]; then
+  echo "MCPs configurados: filesystem, engram, notion, notebooklm"
+elif [ "$NODE_MCPS_MISSING" -eq 1 ]; then
+  echo "MCPs configurados: engram"
+  echo "MCPs pendientes por instalar cuando tengas npm: filesystem, notion, notebooklm"
+else
+  echo "MCPs configurados: engram"
+fi
 echo "Variables recomendadas: NOTION_TOKEN, NOTEBOOKLM_PROFILE"
 echo
 echo "Siguiente paso:"
