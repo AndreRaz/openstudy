@@ -1,141 +1,170 @@
 <p align="center">
-  <a href="https://opencode.ai">
-    <picture>
-      <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
-      <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
-      <img src="packages/console/app/src/asset/logo-ornate-light.svg" alt="OpenCode logo">
-    </picture>
-  </a>
-</p>
-<p align="center">The open source AI coding agent.</p>
-<p align="center">
-  <a href="https://opencode.ai/discord"><img alt="Discord" src="https://img.shields.io/discord/1391832426048651334?style=flat-square&label=discord" /></a>
-  <a href="https://www.npmjs.com/package/opencode-ai"><img alt="npm" src="https://img.shields.io/npm/v/opencode-ai?style=flat-square" /></a>
-  <a href="https://github.com/anomalyco/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/anomalyco/opencode/publish.yml?style=flat-square&branch=dev" /></a>
+  <img src="packages/web/src/assets/lander/screenshot.png" alt="OpenStudy" width="700">
 </p>
 
-<p align="center">
-  <a href="README.md">English</a> |
-  <a href="README.zh.md">简体中文</a> |
-  <a href="README.zht.md">繁體中文</a> |
-  <a href="README.ko.md">한국어</a> |
-  <a href="README.de.md">Deutsch</a> |
-  <a href="README.es.md">Español</a> |
-  <a href="README.fr.md">Français</a> |
-  <a href="README.it.md">Italiano</a> |
-  <a href="README.da.md">Dansk</a> |
-  <a href="README.ja.md">日本語</a> |
-  <a href="README.pl.md">Polski</a> |
-  <a href="README.ru.md">Русский</a> |
-  <a href="README.bs.md">Bosanski</a> |
-  <a href="README.ar.md">العربية</a> |
-  <a href="README.no.md">Norsk</a> |
-  <a href="README.br.md">Português (Brasil)</a> |
-  <a href="README.th.md">ไทย</a> |
-  <a href="README.tr.md">Türkçe</a> |
-  <a href="README.uk.md">Українська</a> |
-  <a href="README.bn.md">বাংলা</a> |
-  <a href="README.gr.md">Ελληνικά</a> |
-  <a href="README.vi.md">Tiếng Việt</a>
-</p>
+<h1 align="center">OpenStudy</h1>
+<p align="center"><strong>Tu asistente académico con inteligencia artificial.</strong></p>
+<p align="center">Tutorías, investigación y retroalimentación para estudiantes universitarios — de cualquier carrera.</p>
 
-[![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
+<p align="center">
+  <a href="https://github.com/AndreRaz/openstudy"><img alt="GitHub" src="https://img.shields.io/github/stars/AndreRaz/openstudy?style=flat-square" /></a>
+  <a href="https://github.com/AndreRaz/openstudy/blob/dev/LICENSE"><img alt="License" src="https://img.shields.io/github/license/AndreRaz/openstudy?style=flat-square" /></a>
+</p>
 
 ---
 
-### Installation
+## Qué es OpenStudy
 
-```bash
-# YOLO
-curl -fsSL https://opencode.ai/install | bash
+OpenStudy es una plataforma de asistencia académica potenciada por IA, construida sobre el motor de [opencode](https://github.com/anomalyco/opencode) y diseñada exclusivamente para **estudiantes universitarios no técnicos**.
 
-# Package managers
-npm i -g opencode-ai@latest        # or bun/pnpm/yarn
-scoop install opencode             # Windows
-choco install opencode             # Windows
-brew install anomalyco/tap/opencode # macOS and Linux (recommended, always up to date)
-brew install opencode              # macOS and Linux (official brew formula, updated less)
-sudo pacman -S opencode            # Arch Linux (Stable)
-paru -S opencode-bin               # Arch Linux (Latest from AUR)
-mise use -g opencode               # Any OS
-nix run nixpkgs#opencode           # or github:anomalyco/opencode for latest dev branch
-```
+No es una herramienta de programación. No es un asistente de código. Es un tutor académico que entiende tu carrera — Derecho, Medicina, Psicología, Arquitectura, Diseño, Historia, o cualquier otra disciplina.
 
-> [!TIP]
-> Remove versions older than 0.1.x before installing.
+### Para quién es
 
-### Desktop App (BETA)
-
-OpenCode is also available as a desktop application. Download directly from the [releases page](https://github.com/anomalyco/opencode/releases) or [opencode.ai/download](https://opencode.ai/download).
-
-| Platform              | Download                              |
-| --------------------- | ------------------------------------- |
-| macOS (Apple Silicon) | `opencode-desktop-darwin-aarch64.dmg` |
-| macOS (Intel)         | `opencode-desktop-darwin-x64.dmg`     |
-| Windows               | `opencode-desktop-windows-x64.exe`    |
-| Linux                 | `.deb`, `.rpm`, or AppImage           |
-
-```bash
-# macOS (Homebrew)
-brew install --cask opencode-desktop
-# Windows (Scoop)
-scoop bucket add extras; scoop install extras/opencode-desktop
-```
-
-#### Installation Directory
-
-The install script respects the following priority order for the installation path:
-
-1. `$OPENCODE_INSTALL_DIR` - Custom installation directory
-2. `$XDG_BIN_DIR` - XDG Base Directory Specification compliant path
-3. `$HOME/bin` - Standard user binary directory (if it exists or can be created)
-4. `$HOME/.opencode/bin` - Default fallback
-
-```bash
-# Examples
-OPENCODE_INSTALL_DIR=/usr/local/bin curl -fsSL https://opencode.ai/install | bash
-XDG_BIN_DIR=$HOME/.local/bin curl -fsSL https://opencode.ai/install | bash
-```
-
-### Agents
-
-OpenCode includes two built-in agents you can switch between with the `Tab` key.
-
-- **build** - Default, full-access agent for development work
-- **plan** - Read-only agent for analysis and code exploration
-  - Denies file edits by default
-  - Asks permission before running bash commands
-  - Ideal for exploring unfamiliar codebases or planning changes
-
-Also included is a **general** subagent for complex searches and multistep tasks.
-This is used internally and can be invoked using `@general` in messages.
-
-Learn more about [agents](https://opencode.ai/docs/agents).
-
-### Documentation
-
-For more info on how to configure OpenCode, [**head over to our docs**](https://opencode.ai/docs).
-
-### Contributing
-
-If you're interested in contributing to OpenCode, please read our [contributing docs](./CONTRIBUTING.md) before submitting a pull request.
-
-### Building on OpenCode
-
-If you are working on a project that's related to OpenCode and is using "opencode" as part of its name, for example "opencode-dashboard" or "opencode-mobile", please add a note to your README to clarify that it is not built by the OpenCode team and is not affiliated with us in any way.
-
-### FAQ
-
-#### How is this different from Claude Code?
-
-It's very similar to Claude Code in terms of capability. Here are the key differences:
-
-- 100% open source
-- Not coupled to any provider. Although we recommend the models we provide through [OpenCode Zen](https://opencode.ai/zen), OpenCode can be used with Claude, OpenAI, Google, or even local models. As models evolve, the gaps between them will close and pricing will drop, so being provider-agnostic is important.
-- Out-of-the-box LSP support
-- A focus on TUI. OpenCode is built by neovim users and the creators of [terminal.shop](https://terminal.shop); we are going to push the limits of what's possible in the terminal.
-- A client/server architecture. This, for example, can allow OpenCode to run on your computer while you drive it remotely from a mobile app, meaning that the TUI frontend is just one of the possible clients.
+- Estudiantes universitarios de **cualquier carrera**
+- Personas que necesitan ayuda para **entender temas complejos**
+- Quienes buscan un tutor disponible **24/7** que no juzga preguntas "básicas"
 
 ---
 
-**Join our community** [Discord](https://discord.gg/opencode) | [X.com](https://x.com/opencode)
+## Agentes Académicos
+
+OpenStudy incluye 4 agentes especializados. Cada uno tiene un propósito claro:
+
+| Agente | Comando | Qué hace |
+|--------|---------|----------|
+| **Neux Profesor** | `Tab` (default) | Tutorías, resúmenes, flashcards, exámenes de práctica, mapas conceptuales |
+| **Neux Tutor** | `Tab` | Retroalimentación sobre tu material — análisis y diagnóstico (solo lectura) |
+| **Neux Investigador** | `@neux-investigador` | Investigación académica profunda con bibliografía estructurada |
+| **Neux Explorador** | `@neux-explorador` | Navegación de tus archivos de estudio en tu computadora |
+
+Todos los agentes responden en **español** por defecto y siguen principios de integridad académica.
+
+---
+
+## Instalación
+
+### Requisitos previos
+
+- [Bun](https://bun.sh/) v1.3+ (o Node.js 20+)
+- Una API key de un proveedor de IA (Anthropic recomendado)
+
+### Desde el código fuente
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/AndreRaz/openstudy.git
+cd openstudy
+
+# Instalar dependencias
+bun install
+
+# Ejecutar en modo terminal
+bun run dev
+```
+
+### App de escritorio (Beta)
+
+OpenStudy también está disponible como aplicación de escritorio con Tauri:
+
+```bash
+# Ejecutar la app de escritorio en modo desarrollo
+bun run dev:desktop
+```
+
+---
+
+## Herramientas integradas (MCPs)
+
+OpenStudy viene preconfigurado con herramientas que potencian a los agentes:
+
+| Herramienta | Qué hace | Requisito |
+|-------------|----------|-----------|
+| **Filesystem** | Permite a los agentes leer tus archivos de estudio | Ninguno |
+| **Engram** | Memoria persistente — el agente recuerda entre sesiones | Instalar [engram](https://github.com/Gentleman-Programming/engram) |
+| **NotebookLM** | Consulta tus notebooks de Google NotebookLM directamente | Iniciar sesión con Google (una sola vez) |
+
+### Instalar Engram (recomendado)
+
+```bash
+# macOS
+brew install gentleman-programming/tap/engram
+
+# Verificar instalación
+engram version
+```
+
+Engram es un binario Go. Sin Node.js, sin Docker, sin dependencias. [Más info](https://github.com/Gentleman-Programming/engram).
+
+---
+
+## Campos académicos soportados
+
+OpenStudy funciona con **cualquier disciplina universitaria**:
+
+- **Ciencias de la Salud** — Medicina, Enfermería, Odontología, Psicología, Nutrición
+- **Derecho y Ciencias Sociales** — Derecho, Ciencias Políticas, Sociología, Economía
+- **Humanidades y Artes** — Historia, Filosofía, Literatura, Comunicación, Bellas Artes
+- **Ciencias Naturales** — Biología, Química, Física, Matemáticas
+- **Diseño e Ingeniería** — Arquitectura, Diseño Gráfico, Diseño Industrial, Urbanismo
+- **Ciencias Económicas** — Contabilidad, Finanzas, Mercadotecnia, Gestión Empresarial
+- **Ciencias de la Educación** — Pedagogía, Didáctica, Psicología Educativa
+
+---
+
+## Principios
+
+1. **Integridad académica** — No genera trabajos para entregar como propios
+2. **Honestidad intelectual** — Si no sabe algo, lo dice. No inventa datos ni citas
+3. **Profundidad sobre velocidad** — Prefiere explicar bien a responder rápido
+4. **Lenguaje centrado en el estudiante** — Sin jerga técnica de software
+5. **Consciencia de contexto** — Recuerda el tema y objetivo durante toda la sesión
+
+---
+
+## Stack técnico
+
+OpenStudy está construido sobre la arquitectura de [opencode](https://github.com/anomalyco/opencode):
+
+- **Runtime**: Bun + TypeScript + Effect
+- **TUI**: Ink (React para terminal)
+- **Desktop**: Tauri (Rust) + Electron
+- **Web**: Astro + SolidJS
+- **Base de datos**: SQLite con Drizzle ORM
+
+---
+
+## Estructura del proyecto
+
+```
+openstudy/
+├── .opencode/
+│   ├── agents/          # Agentes académicos (Markdown)
+│   └── skills/          # Skills de estudio académico
+├── packages/
+│   ├── opencode/        # Core: CLI + TUI + motor de agentes
+│   ├── app/             # App web (Astro)
+│   ├── desktop/         # App escritorio (Tauri)
+│   ├── desktop-electron/# App escritorio (Electron)
+│   ├── ui/              # Componentes UI compartidos
+│   └── web/             # Landing page
+├── AGENTS.md            # Contrato global de agentes académicos
+├── opencode.json        # Configuración de agentes y MCPs
+└── PRD.md               # Documento de requerimientos del producto
+```
+
+---
+
+## Créditos
+
+OpenStudy es un fork de [opencode](https://github.com/anomalyco/opencode) por [Anomaly](https://anomaly.co). Toda la arquitectura base, el motor de agentes y el sistema de plugins son obra del equipo de opencode.
+
+Herramientas integradas:
+- [Engram](https://github.com/Gentleman-Programming/engram) por Gentleman Programming — memoria persistente para agentes IA
+- [NotebookLM MCP](https://github.com/PleasePrompto/notebooklm-mcp) — integración directa con Google NotebookLM
+
+---
+
+## Licencia
+
+MIT — Ver [LICENSE](./LICENSE) para más detalles.
