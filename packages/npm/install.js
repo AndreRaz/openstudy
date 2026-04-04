@@ -31,6 +31,12 @@ const url = `https://github.com/AndreRaz/openstudy/releases/download/v${version}
 const binDir = path.join(__dirname, 'bin')
 const binName = platform === 'win32' ? 'openstudy-bin.exe' : 'openstudy-bin'
 const binPath = path.join(binDir, binName)
+const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true'
+
+if (isCI) {
+  console.log('openstudy: postinstall omitido en CI/GitHub Actions')
+  process.exit(0)
+}
 
 if (fs.existsSync(binPath)) {
   process.exit(0)
