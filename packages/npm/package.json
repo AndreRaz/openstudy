@@ -1,0 +1,26 @@
+{
+  "name": "neuxora-openstudy",
+  "version": "1.0.7",
+  "description": "Tu asistente académico con inteligencia artificial — tutorías, investigación y retroalimentación para estudiantes universitarios.",
+  "keywords": ["ai", "education", "academic", "student", "tutor", "openstudy", "neuxora"],
+  "author": "AndreRaz",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AndreRaz/openstudy.git"
+  },
+  "homepage": "https://github.com/AndreRaz/openstudy",
+  "bin": {
+    "openstudy": "./bin/openstudy.js"
+  },
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "files": [
+    "bin/openstudy.js",
+    "install.js"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}
