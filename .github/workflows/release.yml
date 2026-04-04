@@ -11,6 +11,7 @@ permissions:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
@@ -18,7 +19,7 @@ jobs:
             arch: x64
             artifact: openstudy-linux-x64.tar.gz
             pack: tar
-          - os: ubuntu-24.04-arm
+          - os: ubuntu-latest
             platform: linux
             arch: arm64
             artifact: openstudy-linux-arm64.tar.gz
@@ -28,7 +29,7 @@ jobs:
             arch: arm64
             artifact: openstudy-darwin-arm64.zip
             pack: zip
-          - os: macos-13
+          - os: macos-latest
             platform: darwin
             arch: x64
             artifact: openstudy-darwin-x64.zip
@@ -55,33 +56,40 @@ jobs:
 
       - name: Build binary
         working-directory: packages/opencode
+        shell: bash
         env:
           OPENSTUDY_VERSION: ${{ github.ref_name }}
         run: |
           VERSION="${OPENSTUDY_VERSION#v}"
           OPENSTUDY_VERSION="$VERSION" bun run script/build.ts --single --skip-embed-web-ui --skip-install
 
+      - name: Find dist directory
+        id: dist
+        shell: bash
+        run: |
+          DIST_DIR=$(find packages/opencode/dist -type d -name "bin" | head -1)
+          echo "dir=$DIST_DIR" >> "$GITHUB_OUTPUT"
+          echo "Found dist dir: $DIST_DIR"
+          ls -la "$DIST_DIR"
+
       - name: Package (tar.gz)
         if: matrix.pack == 'tar'
-        working-directory: packages/opencode
+        shell: bash
         run: |
-          DIST_DIR=$(ls -d dist/opencode-*/bin 2>/dev/null | head -1)
-          tar -czf ../../${{ matrix.artifact }} -C "$DIST_DIR" openstudy
+          tar -czf ${{ matrix.artifact }} -C "${{ steps.dist.outputs.dir }}" openstudy
 
       - name: Package (zip - unix)
         if: matrix.pack == 'zip' && matrix.platform != 'windows'
-        working-directory: packages/opencode
+        shell: bash
         run: |
-          DIST_DIR=$(ls -d dist/opencode-*/bin 2>/dev/null | head -1)
-          cd "$DIST_DIR" && zip ../../../${{ matrix.artifact }} openstudy
+          cd "${{ steps.dist.outputs.dir }}" && zip "$GITHUB_WORKSPACE/${{ matrix.artifact }}" openstudy
 
       - name: Package (zip - windows)
         if: matrix.platform == 'windows'
-        working-directory: packages/opencode
         shell: pwsh
         run: |
-          $distDir = Get-ChildItem -Directory -Path dist -Filter "opencode-*" | Select-Object -First 1
-          Compress-Archive -Path "$($distDir.FullName)\bin\openstudy.exe" -DestinationPath "../../${{ matrix.artifact }}"
+          $binDir = "${{ steps.dist.outputs.dir }}"
+          Compress-Archive -Path "$binDir\openstudy.exe" -DestinationPath "${{ matrix.artifact }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -92,7 +100,7 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
-    name: Create Release
+    name: Upload to Release
 
     steps:
       - uses: actions/checkout@v4
@@ -112,17 +120,13 @@ jobs:
           sha256sum openstudy-* > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
-      - name: Create/Update GitHub Release
+      - name: Upload to GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
           gh release upload "$GITHUB_REF_NAME" \
-            artifacts/openstudy-linux-x64.tar.gz \
-            artifacts/openstudy-linux-arm64.tar.gz \
-            artifacts/openstudy-darwin-arm64.zip \
-            artifacts/openstudy-darwin-x64.zip \
-            artifacts/openstudy-windows-x64.zip \
+            artifacts/openstudy-*.tar.gz \
+            artifacts/openstudy-*.zip \
             artifacts/SHA256SUMS.txt \
             --clobber \
             --repo "$GITHUB_REPOSITORY"
