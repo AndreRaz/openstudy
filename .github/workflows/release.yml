@@ -167,8 +167,8 @@ jobs:
       - name: Set version from tag
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          npm version "$VERSION" --no-git-tag-version
-        working-directory: packages/npm
+          jq --arg v "$VERSION" '.version = $v' packages/npm/package.json > tmp.json
+          mv tmp.json packages/npm/package.json
 
       - name: Publish to npm
         run: npm publish --access public
