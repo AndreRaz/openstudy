@@ -13,3 +13,5 @@ target
 logs/
 *.bun-build
 tsconfig.tsbuildinfo
+*.tar.gz
+*.zip
