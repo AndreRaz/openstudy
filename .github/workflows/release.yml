@@ -72,6 +72,63 @@ jobs:
           echo "Found dist dir: $DIST_DIR"
           ls -la "$DIST_DIR"
 
+      - name: Validate Windows setup output
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          $binDir = "${{ steps.dist.outputs.dir }}"
+          $testHome = Join-Path $env:RUNNER_TEMP 'openstudy-validation-home'
+
+          Remove-Item -Recurse -Force $testHome -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force -Path $testHome | Out-Null
+
+          $env:HOME = $testHome
+          $env:USERPROFILE = $testHome
+
+          $installBin = Join-Path $testHome '.local\bin'
+          New-Item -ItemType Directory -Force -Path $installBin | Out-Null
+
+          Copy-Item "$binDir\openstudy.exe" "$installBin\openstudy.exe" -Force
+          Copy-Item "$binDir\openstudy.exe" "$installBin\engram.exe" -Force
+
+          & "$binDir\setup-openstudy.ps1"
+
+          $agentsDir = Join-Path $testHome '.config\opencode\agents'
+          $skillsDir = Join-Path $testHome '.config\opencode\skills'
+          $configPath = Join-Path $testHome '.config\opencode\opencode.json'
+
+          $requiredAgents = @(
+            'neux-profesor.md',
+            'neux-tutor.md',
+            'neux-investigador.md',
+            'neux-explorador.md'
+          )
+
+          foreach ($agent in $requiredAgents) {
+            if (-not (Test-Path (Join-Path $agentsDir $agent))) {
+              throw "Falta el agente instalado: $agent"
+            }
+          }
+
+          if (-not (Test-Path (Join-Path $skillsDir 'estudio-explorar\SKILL.md'))) {
+            throw 'Falta la skill estudio-explorar en el directorio configurado'
+          }
+
+          if (-not (Test-Path $configPath)) {
+            throw 'No se genero opencode.json'
+          }
+
+          $config = Get-Content -Raw $configPath | ConvertFrom-Json
+          if (-not $config.agent.'neux-profesor') {
+            throw 'opencode.json no incluye neux-profesor'
+          }
+          if (-not $config.mcp.engram) {
+            throw 'opencode.json no incluye la configuracion de engram'
+          }
+          if ($config.mcp.engram.command[0] -notmatch 'engram') {
+            throw 'La configuracion de engram no apunta a un binario esperado'
+          }
+
       - name: Package (tar.gz)
         if: matrix.pack == 'tar'
         shell: bash
@@ -99,6 +156,28 @@ jobs:
           $items = @("$binDir\openstudy.exe", "$binDir\setup-openstudy.ps1", "$binDir\setup-openstudy.cmd")
           if (Test-Path "$binDir\skills") { $items += "$binDir\skills" }
           Compress-Archive -Path $items -DestinationPath "${{ matrix.artifact }}"
+
+      - name: Validate Windows archive contents
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          $extractDir = Join-Path $env:RUNNER_TEMP 'openstudy-release-zip-check'
+          Remove-Item -Recurse -Force $extractDir -ErrorAction SilentlyContinue
+          Expand-Archive -Path "${{ matrix.artifact }}" -DestinationPath $extractDir -Force
+
+          $requiredPaths = @(
+            'openstudy.exe',
+            'setup-openstudy.ps1',
+            'setup-openstudy.cmd',
+            'skills\estudio-explorar\SKILL.md'
+          )
+
+          foreach ($relativePath in $requiredPaths) {
+            $fullPath = Join-Path $extractDir $relativePath
+            if (-not (Test-Path $fullPath)) {
+              throw "Falta en el zip: $relativePath"
+            }
+          }
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -161,8 +240,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Set version from tag
         run: |
