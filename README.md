@@ -46,30 +46,39 @@ Todos los agentes responden en **español** por defecto y siguen principios de i
 
 ### Requisitos previos
 
-- [Bun](https://bun.sh/) v1.3+ (o Node.js 20+)
 - Una API key de un proveedor de IA (Anthropic recomendado)
+
+### Homebrew (recomendado — Linux)
+
+```bash
+brew install AndreRaz/tap/openstudy
+```
+
+Después de instalar, ejecuta:
+
+```bash
+openstudy
+```
+
+### Descarga directa
+
+Descarga el binario desde la [página de releases](https://github.com/AndreRaz/openstudy/releases):
+
+```bash
+# Linux x64
+curl -fsSL https://github.com/AndreRaz/openstudy/releases/download/v1.0.0/openstudy-linux-x64.tar.gz | tar xz
+chmod +x openstudy
+./openstudy
+```
 
 ### Desde el código fuente
 
 ```bash
-# Clonar el repositorio
+# Requiere Bun v1.3+
 git clone https://github.com/AndreRaz/openstudy.git
 cd openstudy
-
-# Instalar dependencias
 bun install
-
-# Ejecutar en modo terminal
 bun run dev
-```
-
-### App de escritorio (Beta)
-
-OpenStudy también está disponible como aplicación de escritorio con Tauri:
-
-```bash
-# Ejecutar la app de escritorio en modo desarrollo
-bun run dev:desktop
 ```
 
 ---
