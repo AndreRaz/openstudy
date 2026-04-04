@@ -47,6 +47,8 @@ Todos los agentes responden en **español** por defecto y siguen principios de i
 ### Requisitos previos
 
 - Una API key de un proveedor de IA (Anthropic recomendado)
+- **Windows:** PowerShell 5+ o PowerShell 7+
+- **Opcional pero recomendado:** Node.js + `npm` si quieres que también se instalen automáticamente los MCPs de `filesystem`, `notion` y `notebooklm`
 
 ### Homebrew (macOS y Linux)
 
@@ -56,6 +58,8 @@ openstudy
 ```
 
 ### Instalación rápida — un comando
+
+Esta es la forma recomendada para la mayoría de usuarios. Descarga OpenStudy, instala Engram si hace falta e intenta dejar configurados los MCPs principales.
 
 **macOS / Linux**
 
@@ -69,11 +73,55 @@ curl -fsSL https://raw.githubusercontent.com/AndreRaz/openstudy/dev/script/insta
 irm https://raw.githubusercontent.com/AndreRaz/openstudy/dev/script/install.ps1 | iex
 ```
 
+Después de correrlo, el instalador:
+
+- descarga `openstudy.exe`
+- intenta instalar **Engram** automáticamente
+- intenta instalar **filesystem MCP**, **Notion MCP** y **NotebookLM MCP** si detecta `npm`
+- ejecuta la configuración inicial de OpenStudy
+
+> Si PowerShell bloquea el comando por políticas de seguridad, abre una terminal como usuario normal y vuelve a intentarlo. Si usas una política corporativa muy restrictiva, descarga el script manualmente y revísalo antes de ejecutarlo.
+
 El instalador intenta dejarte listo también el ecosistema MCP:
 
 - instala **Engram** automáticamente si no existe
 - instala **filesystem MCP**, **Notion MCP** y **NotebookLM MCP** automáticamente si detecta `npm`
 - configura los MCPs en `~/.config/opencode/opencode.json`
+
+### Primer uso después de instalar
+
+Cuando termine la instalación, ejecuta:
+
+```bash
+openstudy providers login
+openstudy
+```
+
+En Windows también puedes usar:
+
+```powershell
+openstudy providers login
+openstudy
+```
+
+### Nota importante para Windows: PATH
+
+El instalador de Windows copia `openstudy.exe` en:
+
+```powershell
+$HOME\.local\bin
+```
+
+Si al abrir una nueva terminal `openstudy` no se reconoce, agrega esa carpeta al `PATH` de tu usuario y vuelve a abrir PowerShell.
+
+Ejemplo:
+
+```powershell
+$bin = Join-Path $HOME '.local\bin'
+[Environment]::SetEnvironmentVariable('Path', $env:Path + ';' + $bin, 'User')
+```
+
+Luego cierra y vuelve a abrir PowerShell.
 
 ### Descarga directa
 
@@ -99,16 +147,16 @@ unzip openstudy.zip && chmod +x openstudy
 ./openstudy
 ```
 
-### Configuración inicial en Windows
+### Configuración manual en Windows (si descargaste el ZIP)
 
-Después de descomprimir `openstudy-windows-x64.zip`, ejecuta:
+Si no usaste el instalador de una línea y descargaste `openstudy-windows-x64.zip` manualmente, ejecuta:
 
 ```powershell
 ./setup-openstudy.cmd
 openstudy.exe
 ```
 
-Eso instala globalmente los 4 agentes académicos en tu configuración de usuario.
+Eso aplica la configuración inicial de OpenStudy en tu usuario.
 
 ### Desde el código fuente
 
