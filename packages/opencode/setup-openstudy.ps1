@@ -1,6 +1,14 @@
 $ErrorActionPreference = 'Stop'
 
-$configHome = if ($env:XDG_CONFIG_HOME) { $env:XDG_CONFIG_HOME } else { Join-Path $HOME '.config' }
+$homeDir = if ($env:HOME) {
+  $env:HOME
+} elseif ($env:USERPROFILE) {
+  $env:USERPROFILE
+} else {
+  $HOME
+}
+
+$configHome = if ($env:XDG_CONFIG_HOME) { $env:XDG_CONFIG_HOME } else { Join-Path $homeDir '.config' }
 $configDir = Join-Path $configHome 'opencode'
 $agentsDir = Join-Path $configDir 'agents'
 $skillsDir = Join-Path $configDir 'skills'
@@ -15,10 +23,10 @@ if ($engramCmd) {
   $engramBin = $engramCmd.Source
 } else {
   $engramCandidates = @(
-    (Join-Path $HOME '.local\bin\engram.exe'),
-    (Join-Path $HOME 'AppData\Local\Programs\engram\engram.exe'),
+    (Join-Path $homeDir '.local\bin\engram.exe'),
+    (Join-Path $homeDir 'AppData\Local\Programs\engram\engram.exe'),
     'C:\ProgramData\scoop\shims\engram.exe',
-    (Join-Path $HOME 'scoop\shims\engram.exe')
+    (Join-Path $homeDir 'scoop\shims\engram.exe')
   )
   foreach ($c in $engramCandidates) {
     if (Test-Path $c) { $engramBin = $c; break }
