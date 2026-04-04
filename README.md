@@ -55,6 +55,20 @@ brew install AndreRaz/tap/openstudy
 openstudy
 ```
 
+### Instalación rápida — un comando
+
+**macOS / Linux**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/AndreRaz/openstudy/dev/script/install.sh | bash
+```
+
+**Windows (PowerShell)**
+
+```powershell
+irm https://raw.githubusercontent.com/AndreRaz/openstudy/dev/script/install.ps1 | iex
+```
+
 ### Descarga directa
 
 Descarga el binario para tu plataforma desde la [página de releases](https://github.com/AndreRaz/openstudy/releases):
