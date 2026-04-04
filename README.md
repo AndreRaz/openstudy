@@ -69,6 +69,12 @@ curl -fsSL https://raw.githubusercontent.com/AndreRaz/openstudy/dev/script/insta
 irm https://raw.githubusercontent.com/AndreRaz/openstudy/dev/script/install.ps1 | iex
 ```
 
+El instalador intenta dejarte listo también el ecosistema MCP:
+
+- instala **Engram** automáticamente si no existe
+- instala **filesystem MCP**, **Notion MCP** y **NotebookLM MCP** automáticamente si detecta `npm`
+- configura los MCPs en `~/.config/opencode/opencode.json`
+
 ### Descarga directa
 
 Descarga el binario para tu plataforma desde la [página de releases](https://github.com/AndreRaz/openstudy/releases):
@@ -122,11 +128,20 @@ OpenStudy viene preconfigurado con herramientas que potencian a los agentes:
 
 | Herramienta | Qué hace | Requisito |
 |-------------|----------|-----------|
-| **Filesystem** | Permite a los agentes leer tus archivos de estudio | Ninguno |
-| **Engram** | Memoria persistente — el agente recuerda entre sesiones | Instalar [engram](https://github.com/Gentleman-Programming/engram) |
-| **NotebookLM** | Consulta tus notebooks de Google NotebookLM directamente | Iniciar sesión con Google (una sola vez) |
+| **Filesystem** | Permite a los agentes leer tus archivos de estudio | Se instala automáticamente si hay `npm` |
+| **Engram** | Memoria persistente — el agente recuerda entre sesiones | El instalador intenta instalarlo automáticamente |
+| **Notion** | Consulta y automatización sobre tu workspace de Notion | Requiere `NOTION_TOKEN` |
+| **NotebookLM** | Consulta tus notebooks de Google NotebookLM directamente | Requiere login con Google (una sola vez) |
 
-### Instalar Engram (recomendado)
+### Nota sobre instalación automática de MCPs
+
+OpenStudy intenta instalar estos MCPs durante la instalación principal. Si alguno no queda disponible:
+
+- vuelve a correr el instalador
+- asegúrate de tener `npm` instalado para los MCPs de Node.js
+- exporta `NOTION_TOKEN` para Notion
+
+### Instalar Engram manualmente (si hace falta)
 
 ```bash
 # macOS

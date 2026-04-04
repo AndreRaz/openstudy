@@ -3,6 +3,7 @@ set -euo pipefail
 
 REPO="AndreRaz/openstudy"
 INSTALL_DIR="${OPENSTUDY_INSTALL_DIR:-${XDG_BIN_DIR:-$HOME/.local/bin}}"
+NPM_PREFIX="${OPENSTUDY_NPM_PREFIX:-$HOME/.openstudy/npm}"
 TMP_DIR="$(mktemp -d)"
 
 cleanup() {
@@ -15,6 +16,10 @@ need() {
     echo "Error: falta '$1' en el sistema." >&2
     exit 1
   }
+}
+
+has() {
+  command -v "$1" >/dev/null 2>&1
 }
 
 need curl
@@ -30,8 +35,8 @@ case "$OS" in
 esac
 
 case "$ARCH" in
-  x86_64|amd64) arch="x64" ;;
-  arm64|aarch64) arch="arm64" ;;
+  x86_64|amd64) arch="x64"; engram_arch="amd64" ;;
+  arm64|aarch64) arch="arm64"; engram_arch="arm64" ;;
   *) echo "Arquitectura no soportada: $ARCH" >&2; exit 1 ;;
 esac
 
@@ -67,6 +72,95 @@ esac
 chmod +x "$TMP_DIR/openstudy" 2>/dev/null || true
 install -m 755 "$TMP_DIR/openstudy" "$INSTALL_DIR/openstudy"
 
+install_engram() {
+  if has engram; then
+    echo "  · Engram ya está instalado"
+    return
+  fi
+
+  echo "🧠 Instalando Engram..."
+  if has brew; then
+    brew install gentleman-programming/tap/engram
+    return
+  fi
+
+  if ! has python3; then
+    echo "  ! No se pudo instalar Engram automáticamente: falta python3 o brew"
+    return
+  fi
+
+  local engram_asset="engram_latest_${platform}_${engram_arch}"
+  local engram_url
+  engram_url="$(python3 - "$platform" "$engram_arch" <<'PY'
+import json, urllib.request, sys
+platform = sys.argv[1]
+arch = sys.argv[2]
+api = 'https://api.github.com/repos/Gentleman-Programming/engram/releases/latest'
+with urllib.request.urlopen(api) as r:
+    data = json.load(r)
+needle = f'_{platform}_{arch}'
+for asset in data['assets']:
+    name = asset['name']
+    if needle in name and (name.endswith('.tar.gz') or name.endswith('.zip')):
+        print(asset['browser_download_url'])
+        break
+else:
+    raise SystemExit('')
+PY
+)"
+
+  if [ -z "$engram_url" ]; then
+    echo "  ! No se encontró un asset compatible de Engram"
+    return
+  fi
+
+  local engram_archive="$TMP_DIR/engram-asset"
+  curl -fsSL "$engram_url" -o "$engram_archive"
+  case "$engram_url" in
+    *.tar.gz) tar -xzf "$engram_archive" -C "$TMP_DIR" ;;
+    *.zip) unzip -q "$engram_archive" -d "$TMP_DIR" ;;
+  esac
+
+  local engram_bin
+  engram_bin="$(find "$TMP_DIR" -type f -name 'engram' | head -1)"
+  if [ -n "$engram_bin" ]; then
+    install -m 755 "$engram_bin" "$INSTALL_DIR/engram"
+    echo "  ✓ Engram instalado en $INSTALL_DIR/engram"
+  else
+    echo "  ! Falló la instalación automática de Engram"
+  fi
+}
+
+link_npm_bin() {
+  local src="$1"
+  local target="$2"
+  if [ -f "$src" ]; then
+    ln -sf "$src" "$target"
+  fi
+}
+
+install_node_mcps() {
+  if ! has npm; then
+    echo "📦 npm no está disponible. Se omite instalación automática de filesystem/notion/notebooklm MCP."
+    echo "   Instálalos luego con Node.js + npm y vuelve a correr el instalador si quieres."
+    return
+  fi
+
+  echo "📦 Instalando MCPs de Node.js (filesystem, notion, notebooklm)..."
+  mkdir -p "$NPM_PREFIX"
+  npm install -g --prefix "$NPM_PREFIX" @modelcontextprotocol/server-filesystem notion-mcp-server notebooklm-mcp >/dev/null
+
+  mkdir -p "$INSTALL_DIR"
+  link_npm_bin "$NPM_PREFIX/bin/mcp-server-filesystem" "$INSTALL_DIR/mcp-server-filesystem"
+  link_npm_bin "$NPM_PREFIX/bin/notion-mcp-server" "$INSTALL_DIR/notion-mcp-server"
+  link_npm_bin "$NPM_PREFIX/bin/notebooklm-mcp" "$INSTALL_DIR/notebooklm-mcp"
+
+  echo "  ✓ MCPs npm instalados"
+}
+
+install_engram
+install_node_mcps
+
 if [ -f "$TMP_DIR/setup-openstudy.sh" ]; then
   chmod +x "$TMP_DIR/setup-openstudy.sh"
   "$TMP_DIR/setup-openstudy.sh"
@@ -77,6 +171,9 @@ echo "✅ OpenStudy instalado en: $INSTALL_DIR/openstudy"
 echo
 echo "Si '$INSTALL_DIR' no está en tu PATH, agrega esto a tu shell:"
 echo "  export PATH=\"$INSTALL_DIR:\$PATH\""
+echo
+echo "MCPs configurados: filesystem, engram, notion, notebooklm"
+echo "Variables recomendadas: NOTION_TOKEN, NOTEBOOKLM_PROFILE"
 echo
 echo "Siguiente paso:"
 echo "  openstudy providers login"
