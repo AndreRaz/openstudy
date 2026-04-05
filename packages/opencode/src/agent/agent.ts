@@ -13,6 +13,10 @@ import PROMPT_COMPACTION from "./prompt/compaction.txt"
 import PROMPT_EXPLORE from "./prompt/explore.txt"
 import PROMPT_SUMMARY from "./prompt/summary.txt"
 import PROMPT_TITLE from "./prompt/title.txt"
+import PROMPT_NEUX_PROFESOR from "./prompt/neux-profesor.txt"
+import PROMPT_NEUX_TUTOR from "./prompt/neux-tutor.txt"
+import PROMPT_NEUX_INVESTIGADOR from "./prompt/neux-investigador.txt"
+import PROMPT_NEUX_EXPLORADOR from "./prompt/neux-explorador.txt"
 import { Permission } from "@/permission"
 import { mergeDeep, pipe, sortBy, values } from "remeda"
 import { Global } from "@/global"
@@ -109,6 +113,7 @@ export namespace Agent {
               name: "build",
               description: "The default agent. Executes tools based on configured permissions.",
               options: {},
+              hidden: true,
               permission: Permission.merge(
                 defaults,
                 Permission.fromConfig({
@@ -124,6 +129,7 @@ export namespace Agent {
               name: "plan",
               description: "Plan mode. Disallows all edit tools.",
               options: {},
+              hidden: true,
               permission: Permission.merge(
                 defaults,
                 Permission.fromConfig({
@@ -134,7 +140,7 @@ export namespace Agent {
                   },
                   edit: {
                     "*": "deny",
-                    [path.join(".opencode", "plans", "*.md")]: "allow",
+                    [path.join("study", "plans", "*.md")]: "allow",
                     [path.relative(Instance.worktree, path.join(Global.Path.data, path.join("plans", "*.md")))]:
                       "allow",
                   },
@@ -146,7 +152,8 @@ export namespace Agent {
             },
             general: {
               name: "general",
-              description: `General-purpose agent for researching complex questions and executing multi-step tasks. Use this agent to execute multiple units of work in parallel.`,
+              description: `General-purpose agent for researching complex questions and executing multi-step tasks.`,
+              hidden: true,
               permission: Permission.merge(
                 defaults,
                 Permission.fromConfig({
@@ -160,6 +167,7 @@ export namespace Agent {
             },
             explore: {
               name: "explore",
+              hidden: true,
               permission: Permission.merge(
                 defaults,
                 Permission.fromConfig({
@@ -179,7 +187,7 @@ export namespace Agent {
                 }),
                 user,
               ),
-              description: `Fast agent specialized for exploring codebases. Use this when you need to quickly find files by patterns (eg. "src/components/**/*.tsx"), search code for keywords (eg. "API endpoints"), or answer questions about the codebase (eg. "how do API endpoints work?"). When calling this agent, specify the desired thoroughness level: "quick" for basic searches, "medium" for moderate exploration, or "very thorough" for comprehensive analysis across multiple locations and naming conventions.`,
+              description: `Fast agent for exploring codebases.`,
               prompt: PROMPT_EXPLORE,
               options: {},
               mode: "subagent",
@@ -215,6 +223,105 @@ export namespace Agent {
                 user,
               ),
               prompt: PROMPT_TITLE,
+            },
+            "neux-profesor": {
+              name: "neux-profesor",
+              description: "Neux Profesor — AI-powered academic professor that generates study materials, tutors concepts, and creates practice exams.",
+              prompt: PROMPT_NEUX_PROFESOR,
+              color: "#7C3AED",
+              temperature: 0.4,
+              model: Provider.parseModel("anthropic/claude-sonnet-4-20250514"),
+              options: {},
+              mode: "primary",
+              native: true,
+              permission: Permission.merge(
+                defaults,
+                Permission.fromConfig({
+                  edit: "ask",
+                  bash: {
+                    "*": "deny",
+                    "open *": "allow",
+                    "ls *": "allow",
+                    "find *": "allow",
+                    "cat *": "allow",
+                    "grep *": "allow",
+                  },
+                }),
+                user,
+              ),
+            },
+            "neux-tutor": {
+              name: "neux-tutor",
+              description: "Neux Tutor — evaluates academic work, provides structured feedback, diagnoses knowledge gaps. Read-only.",
+              prompt: PROMPT_NEUX_TUTOR,
+              color: "#0891B2",
+              temperature: 0.2,
+              model: Provider.parseModel("anthropic/claude-sonnet-4-20250514"),
+              options: {},
+              mode: "primary",
+              native: true,
+              permission: Permission.merge(
+                defaults,
+                Permission.fromConfig({
+                  edit: "deny",
+                  bash: {
+                    "*": "deny",
+                    "ls *": "allow",
+                    "find *": "allow",
+                    "cat *": "allow",
+                    "grep *": "allow",
+                  },
+                  webfetch: "allow",
+                }),
+                user,
+              ),
+            },
+            "neux-investigador": {
+              name: "neux-investigador",
+              description: "Neux Investigador — deep multi-source academic research with structured bibliography and critical analysis.",
+              prompt: PROMPT_NEUX_INVESTIGADOR,
+              temperature: 0.3,
+              model: Provider.parseModel("anthropic/claude-sonnet-4-20250514"),
+              options: {},
+              mode: "subagent",
+              native: true,
+              permission: Permission.merge(
+                defaults,
+                Permission.fromConfig({
+                  edit: "deny",
+                  bash: {
+                    "*": "deny",
+                    "curl *": "allow",
+                  },
+                  webfetch: "allow",
+                }),
+                user,
+              ),
+            },
+            "neux-explorador": {
+              name: "neux-explorador",
+              description: "Neux Explorador — navigates study files and materials in read-only mode. Cannot modify anything.",
+              prompt: PROMPT_NEUX_EXPLORADOR,
+              color: "#10B981",
+              temperature: 0.3,
+              model: Provider.parseModel("anthropic/claude-sonnet-4-20250514"),
+              options: {},
+              mode: "subagent",
+              native: true,
+              permission: Permission.merge(
+                defaults,
+                Permission.fromConfig({
+                  edit: "deny",
+                  bash: {
+                    "*": "deny",
+                    "ls *": "allow",
+                    "find *": "allow",
+                    "cat *": "allow",
+                    "grep *": "allow",
+                  },
+                }),
+                user,
+              ),
             },
             summary: {
               name: "summary",
@@ -288,7 +395,7 @@ export namespace Agent {
               agents,
               values(),
               sortBy(
-                [(x) => (cfg.default_agent ? x.name === cfg.default_agent : x.name === "build"), "desc"],
+                [(x) => (cfg.default_agent ? x.name === cfg.default_agent : x.name === "neux-profesor"), "desc"],
                 [(x) => x.name, "asc"],
               ),
             )

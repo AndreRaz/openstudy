@@ -94,7 +94,7 @@ El instalador hace todo esto automáticamente:
 - Instala **Engram** (memoria persistente) si no está presente
 - Configura los **agentes académicos** (Neux Profesor, Tutor, Investigador, Explorador)
 - Instala las **6 skills académicas** globalmente (redacción, matemáticas, resumen, flashcards, plan de estudio, exploración)
-- Configura los **MCPs** en `~/.config/opencode/opencode.json` usando `npx` — no requiere instalación previa de paquetes npm
+- Configura los **MCPs** en `~/.config/openstudy/openstudy.json` usando `npx` — no requiere instalación previa de paquetes npm
 
 > **Windows**: Si PowerShell bloquea el script por políticas de seguridad, abre una nueva terminal como usuario normal y vuelve a intentarlo.
 
@@ -236,9 +236,9 @@ OpenStudy funciona con **cualquier disciplina universitaria**:
 OpenStudy está construido sobre la arquitectura de [opencode](https://github.com/anomalyco/opencode):
 
 - **Runtime**: Bun + TypeScript + Effect
-- **TUI**: Ink (React para terminal)
+- **TUI**: OpenTUI (SolidJS para terminal)
 - **Desktop**: Tauri (Rust) + Electron
-- **Web**: Astro + SolidJS
+- **Web**: Vite + SolidJS (app) / Astro + SolidJS (landing)
 - **Base de datos**: SQLite con Drizzle ORM
 
 ---
@@ -247,8 +247,12 @@ OpenStudy está construido sobre la arquitectura de [opencode](https://github.co
 
 ```
 openstudy/
-├── .opencode/
-│   └── skills/                  # Skills de desarrollo del proyecto (dev)
+├── study/                       # Overlay de desarrollo (no se distribuye al usuario final)
+│   ├── skills/                  # Skills en desarrollo (no bundled aún)
+│   ├── plugins/                 # Event hooks personalizados (.ts)
+│   ├── tools/                   # Herramientas LLM custom (.ts)
+│   ├── themes/                  # Temas visuales custom (.json)
+│   └── openstudy.json           # Config overlay local avanzado (opcional)
 ├── packages/
 │   ├── opencode/                # Core: CLI + TUI + motor de agentes
 │   │   └── skills/              # Skills académicas distribuidas con el instalador
@@ -258,7 +262,7 @@ openstudy/
 │   │       ├── resumen/
 │   │       ├── flashcards/
 │   │       └── plan-estudio/
-│   ├── app/                     # App web (Astro)
+│   ├── app/                     # App web (Vite + SolidJS)
 │   ├── desktop/                 # App escritorio (Tauri)
 │   ├── desktop-electron/        # App escritorio (Electron)
 │   ├── ui/                      # Componentes UI compartidos
@@ -267,11 +271,16 @@ openstudy/
 │   ├── install.sh               # Instalador macOS/Linux
 │   └── install.ps1              # Instalador Windows
 ├── AGENTS.md                    # Contrato global de agentes académicos
-├── opencode.json                # Configuración de agentes y MCPs
+├── study.json                   # Configuración raíz: plugins y MCPs
 └── PRD.md                       # Documento de requerimientos del producto
 ```
 
-Al instalar, las skills se copian a `~/.config/opencode/skills/` y quedan disponibles globalmente.
+**Capas de configuración:**
+- `study.json` — config raíz del proyecto (plugins, MCPs). Es el archivo principal.
+- `study/openstudy.json` — overlay local avanzado (opcional, para configuración más granular).
+- `~/.config/openstudy/openstudy.json` — config global del usuario.
+
+Al instalar, las skills se distribuyen junto al binario y quedan disponibles globalmente.
 
 ---
 

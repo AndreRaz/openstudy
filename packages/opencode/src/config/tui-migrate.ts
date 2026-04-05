@@ -137,12 +137,18 @@ async function backupAndStripLegacy(file: string, source: string) {
 async function opencodeFiles(input: { directories: string[]; managed: string }) {
   const project = Flag.OPENCODE_DISABLE_PROJECT_CONFIG
     ? []
-    : await ConfigPaths.projectFiles("opencode", Instance.directory, Instance.worktree)
-  const files = [...project, ...ConfigPaths.fileInDirectory(Global.Path.config, "opencode")]
+    : await ConfigPaths.projectFiles("study", Instance.directory, Instance.worktree)
+  const files = [
+    ...project,
+    ...ConfigPaths.fileInDirectory(Global.Path.config, "openstudy"),
+    ...ConfigPaths.fileInDirectory(Global.Path.config, "opencode"),
+  ]
   for (const dir of unique(input.directories)) {
+    files.push(...ConfigPaths.fileInDirectory(dir, "openstudy"))
     files.push(...ConfigPaths.fileInDirectory(dir, "opencode"))
   }
   if (Flag.OPENCODE_CONFIG) files.push(Flag.OPENCODE_CONFIG)
+  files.push(...ConfigPaths.fileInDirectory(input.managed, "openstudy"))
   files.push(...ConfigPaths.fileInDirectory(input.managed, "opencode"))
 
   const existing = await Promise.all(

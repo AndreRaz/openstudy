@@ -159,6 +159,11 @@ export namespace Skill {
       }
     }
 
+    const bundledSkillsDir = path.join(path.dirname(process.execPath), "skills")
+    if (yield* fsys.isDir(bundledSkillsDir)) {
+      yield* scan(state, bus, bundledSkillsDir, SKILL_PATTERN, { scope: "bundled" })
+    }
+
     const configDirs = yield* config.directories()
     for (const dir of configDirs) {
       yield* scan(state, bus, dir, OPENCODE_SKILL_PATTERN)

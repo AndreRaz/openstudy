@@ -10601,7 +10601,7 @@ export const snapshot = {
     env: ["OPENCODE_API_KEY"],
     npm: "@ai-sdk/openai-compatible",
     api: "https://opencode.ai/zen/v1",
-    name: "OpenCode Zen",
+    name: "OpenStudy Zen",
     doc: "https://opencode.ai/docs/zen",
     models: {
       "gpt-5.3-codex": {

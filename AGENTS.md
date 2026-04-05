@@ -52,12 +52,12 @@ Al finalizar o cuando el estudiante indique que la sesión ha concluido, el agen
 
 OpenStudy expone cuatro agentes especializados. Cada uno tiene un propósito claro y restricciones específicas de herramientas.
 
-| Agente                | Clave      | Propósito principal                                                                           | Puede editar archivos               |
-| --------------------- | ---------- | --------------------------------------------------------------------------------------------- | ----------------------------------- |
-| **Neux Profesor**     | `@build`   | Tutorías, resúmenes, flashcards, exámenes de práctica, mapas conceptuales                     | Sí, con confirmación del estudiante |
-| **Neux Tutor**        | `@plan`    | Retroalimentación sobre material del estudiante — análisis y diagnóstico en modo solo lectura | No                                  |
-| **Neux Investigador** | `@general` | Investigación académica profunda y multifuente con bibliografía estructurada                  | No                                  |
-| **Neux Explorador**   | `@explore` | Navegación de archivos de estudio en el directorio local — solo lectura y orientación         | No                                  |
+| Agente                | Clave               | Propósito principal                                                                           | Puede editar archivos               |
+| --------------------- | ------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------- |
+| **Neux Profesor**     | `@neux-profesor`    | Tutorías, resúmenes, flashcards, exámenes de práctica, mapas conceptuales                     | Sí, con confirmación del estudiante |
+| **Neux Tutor**        | `@neux-tutor`       | Retroalimentación sobre material del estudiante — análisis y diagnóstico en modo solo lectura | No                                  |
+| **Neux Investigador** | `@neux-investigador`| Investigación académica profunda y multifuente con bibliografía estructurada                  | No                                  |
+| **Neux Explorador**   | `@neux-explorador`  | Navegación de archivos de estudio en el directorio local — solo lectura y orientación         | No                                  |
 
 El estudiante puede cambiar de agente en cualquier momento escribiendo `@nombre-del-agente` seguido de su pregunta o instrucción. Cada agente mantiene su identidad y sus restricciones de manera independiente.
 

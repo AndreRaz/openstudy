@@ -162,7 +162,7 @@ export const McpAuthCommand = cmd({
 
         if (oauthServers.length === 0) {
           prompts.log.warn("No OAuth-capable MCP servers configured")
-          prompts.log.info("Remote MCP servers support OAuth by default. Add a remote server in opencode.json:")
+          prompts.log.info("Remote MCP servers support OAuth by default. Add a remote server in study.json:")
           prompts.log.info(`
   "mcp": {
     "my-server": {
@@ -381,21 +381,32 @@ export const McpLogoutCommand = cmd({
 })
 
 async function resolveConfigPath(baseDir: string, global = false) {
-  // Check for existing config files (prefer .jsonc over .json, check .opencode/ subdirectory too)
-  const candidates = [path.join(baseDir, "opencode.json"), path.join(baseDir, "opencode.jsonc")]
-
-  if (!global) {
-    candidates.push(path.join(baseDir, ".opencode", "opencode.json"), path.join(baseDir, ".opencode", "opencode.jsonc"))
-  }
-
-  for (const candidate of candidates) {
-    if (await Filesystem.exists(candidate)) {
-      return candidate
+  if (global) {
+    // Global config: under ~/.config/openstudy/ — openstudy.json is canonical, opencode.json is legacy
+    const candidates = [
+      path.join(baseDir, "openstudy.json"),
+      path.join(baseDir, "openstudy.jsonc"),
+      path.join(baseDir, "opencode.json"),
+      path.join(baseDir, "opencode.jsonc"),
+    ]
+    for (const candidate of candidates) {
+      if (await Filesystem.exists(candidate)) return candidate
     }
+    return candidates[0] // default: openstudy.json
   }
 
-  // Default to opencode.json if none exist
-  return candidates[0]
+  // Project config: study.json is the source of truth (loaded via ConfigPaths.projectFiles("study", ...))
+  const candidates = [
+    path.join(baseDir, "study.json"),
+    path.join(baseDir, "study.jsonc"),
+    // legacy fallback
+    path.join(baseDir, "opencode.json"),
+    path.join(baseDir, "opencode.jsonc"),
+  ]
+  for (const candidate of candidates) {
+    if (await Filesystem.exists(candidate)) return candidate
+  }
+  return candidates[0] // default: study.json
 }
 
 async function addMcpToConfig(name: string, mcpConfig: Config.Mcp, configPath: string) {

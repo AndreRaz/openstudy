@@ -62,9 +62,9 @@ export namespace Config {
   function systemManagedConfigDir(): string {
     switch (process.platform) {
       case "darwin":
-        return "/Library/Application Support/opencode"
+        return "/Library/Application Support/openstudy"
       case "win32":
-        return path.join(process.env.ProgramData || "C:\\ProgramData", "opencode")
+        return path.join(process.env.ProgramData || "C:\\ProgramData", "openstudy")
       default:
         return "/etc/opencode"
     }
@@ -221,7 +221,7 @@ export namespace Config {
       })
       if (!md) continue
 
-      const patterns = ["/.opencode/command/", "/.opencode/commands/", "/command/", "/commands/"]
+      const patterns = ["/study/command/", "/study/commands/", "/command/", "/commands/"]
       const file = rel(item, patterns) ?? path.basename(item)
       const name = trim(file)
 
@@ -260,7 +260,7 @@ export namespace Config {
       })
       if (!md) continue
 
-      const patterns = ["/.opencode/agent/", "/.opencode/agents/", "/agent/", "/agents/"]
+      const patterns = ["/study/agent/", "/study/agents/", "/agent/", "/agents/"]
       const file = rel(item, patterns) ?? path.basename(item)
       const agentName = trim(file)
 
@@ -1065,13 +1065,14 @@ export namespace Config {
   export class Service extends ServiceMap.Service<Service, Interface>()("@opencode/Config") {}
 
   function globalConfigFile() {
-    const candidates = ["opencode.jsonc", "opencode.json", "config.json"].map((file) =>
-      path.join(Global.Path.config, file),
+    // Prefer openstudy.json/jsonc; fall back to opencode.json/jsonc for legacy compat
+    const candidates = ["openstudy.jsonc", "openstudy.json", "opencode.jsonc", "opencode.json", "config.json"].map(
+      (file) => path.join(Global.Path.config, file),
     )
     for (const file of candidates) {
       if (existsSync(file)) return file
     }
-    return candidates[0]
+    return path.join(Global.Path.config, "openstudy.json")
   }
 
   function patchJsonc(input: string, patch: unknown, path: string[] = []): string {
@@ -1219,8 +1220,11 @@ export namespace Config {
           let result: Info = pipe(
             {},
             mergeDeep(yield* loadFile(path.join(Global.Path.config, "config.json"))),
+            // legacy opencode.json/jsonc loaded first so openstudy.json can override
             mergeDeep(yield* loadFile(path.join(Global.Path.config, "opencode.json"))),
             mergeDeep(yield* loadFile(path.join(Global.Path.config, "opencode.jsonc"))),
+            mergeDeep(yield* loadFile(path.join(Global.Path.config, "openstudy.json"))),
+            mergeDeep(yield* loadFile(path.join(Global.Path.config, "openstudy.jsonc"))),
           )
 
           const legacy = path.join(Global.Path.config, "config")
@@ -1316,7 +1320,7 @@ export namespace Config {
 
           if (!Flag.OPENCODE_DISABLE_PROJECT_CONFIG) {
             for (const file of yield* Effect.promise(() =>
-              ConfigPaths.projectFiles("opencode", ctx.directory, ctx.worktree),
+              ConfigPaths.projectFiles("study", ctx.directory, ctx.worktree),
             )) {
               merge(file, yield* loadFile(file), "local")
             }
@@ -1335,8 +1339,9 @@ export namespace Config {
           const deps: Promise<void>[] = []
 
           for (const dir of unique(directories)) {
-            if (dir.endsWith(".opencode") || dir === Flag.OPENCODE_CONFIG_DIR) {
-              for (const file of ["opencode.json", "opencode.jsonc"]) {
+            if (dir.endsWith("study") || dir === Flag.OPENCODE_CONFIG_DIR) {
+              // openstudy.json takes priority; opencode.json is legacy fallback
+              for (const file of ["openstudy.json", "openstudy.jsonc", "opencode.json", "opencode.jsonc"]) {
                 const source = path.join(dir, file)
                 log.debug(`loading config from ${source}`)
                 merge(source, yield* loadFile(source))
@@ -1404,7 +1409,8 @@ export namespace Config {
           }
 
           if (existsSync(managedDir)) {
-            for (const file of ["opencode.json", "opencode.jsonc"]) {
+            // openstudy.json takes priority; opencode.json is legacy fallback
+            for (const file of ["openstudy.json", "openstudy.jsonc", "opencode.json", "opencode.jsonc"]) {
               const source = path.join(managedDir, file)
               merge(source, yield* loadFile(source), "global")
             }
