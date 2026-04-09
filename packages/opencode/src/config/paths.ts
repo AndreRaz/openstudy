@@ -12,13 +12,17 @@ export namespace ConfigPaths {
     return Filesystem.findUp([`${name}.json`, `${name}.jsonc`], directory, worktree, { rootFirst: true })
   }
 
+  // OpenStudy searches for "openstudy" (primary), "study" (legacy), and "opencode" (compat) directories.
+  // "openstudy" takes priority when multiple exist.
+  const OPENSTUDY_DIR_TARGETS = ["openstudy", "study"]
+
   export async function directories(directory: string, worktree: string) {
     return [
       Global.Path.config,
       ...(!Flag.OPENCODE_DISABLE_PROJECT_CONFIG
         ? await Array.fromAsync(
             Filesystem.up({
-              targets: ["study"],
+              targets: OPENSTUDY_DIR_TARGETS,
               start: directory,
               stop: worktree,
             }),
@@ -26,7 +30,7 @@ export namespace ConfigPaths {
         : []),
       ...(await Array.fromAsync(
         Filesystem.up({
-          targets: ["study"],
+          targets: OPENSTUDY_DIR_TARGETS,
           start: Global.Path.home,
           stop: Global.Path.home,
         }),

@@ -1319,10 +1319,13 @@ export namespace Config {
           }
 
           if (!Flag.OPENCODE_DISABLE_PROJECT_CONFIG) {
-            for (const file of yield* Effect.promise(() =>
-              ConfigPaths.projectFiles("study", ctx.directory, ctx.worktree),
-            )) {
-              merge(file, yield* loadFile(file), "local")
+            // Load openstudy config files first (priority), then study (legacy)
+            for (const name of ["openstudy", "study"] as const) {
+              for (const file of yield* Effect.promise(() =>
+                ConfigPaths.projectFiles(name, ctx.directory, ctx.worktree),
+              )) {
+                merge(file, yield* loadFile(file), "local")
+              }
             }
           }
 
