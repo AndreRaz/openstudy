@@ -395,18 +395,15 @@ async function resolveConfigPath(baseDir: string, global = false) {
     return candidates[0] // default: openstudy.json
   }
 
-  // Project config: study.json is the source of truth (loaded via ConfigPaths.projectFiles("study", ...))
+  // Project config: openstudy.json is canonical
   const candidates = [
-    path.join(baseDir, "study.json"),
-    path.join(baseDir, "study.jsonc"),
-    // legacy fallback
-    path.join(baseDir, "opencode.json"),
-    path.join(baseDir, "opencode.jsonc"),
+    path.join(baseDir, "openstudy.json"),
+    path.join(baseDir, "openstudy.jsonc"),
   ]
   for (const candidate of candidates) {
     if (await Filesystem.exists(candidate)) return candidate
   }
-  return candidates[0] // default: study.json
+  return candidates[0] // default: openstudy.json
 }
 
 async function addMcpToConfig(name: string, mcpConfig: Config.Mcp, configPath: string) {

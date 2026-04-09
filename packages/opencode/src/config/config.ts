@@ -1319,8 +1319,7 @@ export namespace Config {
           }
 
           if (!Flag.OPENCODE_DISABLE_PROJECT_CONFIG) {
-            // Load openstudy config files first (priority), then study (legacy)
-            for (const name of ["openstudy", "study"] as const) {
+            for (const name of ["openstudy"] as const) {
               for (const file of yield* Effect.promise(() =>
                 ConfigPaths.projectFiles(name, ctx.directory, ctx.worktree),
               )) {
@@ -1342,7 +1341,7 @@ export namespace Config {
           const deps: Promise<void>[] = []
 
           for (const dir of unique(directories)) {
-            if (dir.endsWith("study") || dir === Flag.OPENCODE_CONFIG_DIR) {
+            if (dir.endsWith("openstudy") || dir === Flag.OPENCODE_CONFIG_DIR) {
               // openstudy.json takes priority; opencode.json is legacy fallback
               for (const file of ["openstudy.json", "openstudy.jsonc", "opencode.json", "opencode.jsonc"]) {
                 const source = path.join(dir, file)
