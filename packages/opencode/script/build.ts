@@ -261,8 +261,8 @@ for (const item of targets) {
   if (fs.existsSync(setupCmd)) {
     await $`cp ${setupCmd} dist/${name}/bin/setup-openstudy.cmd`
   }
-  // Include global skills alongside the binary
-  const skillsSrc = path.join(dir, "skills")
+  // Include global skills alongside the binary (from openstudy/skills/ at repo root)
+  const skillsSrc = path.join(dir, "../../openstudy/skills")
   if (fs.existsSync(skillsSrc)) {
     fs.cpSync(skillsSrc, path.join(dir, `dist/${name}/bin/skills`), { recursive: true })
   }
