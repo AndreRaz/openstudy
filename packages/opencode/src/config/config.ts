@@ -1342,8 +1342,8 @@ export namespace Config {
 
           for (const dir of unique(directories)) {
             if (dir.endsWith("openstudy") || dir === Flag.OPENCODE_CONFIG_DIR) {
-              // openstudy.json takes priority; opencode.json is legacy fallback
-              for (const file of ["openstudy.json", "openstudy.jsonc", "opencode.json", "opencode.jsonc"]) {
+              // opencode.json loaded first (legacy), openstudy.json loaded last so it wins
+              for (const file of ["opencode.json", "opencode.jsonc", "openstudy.json", "openstudy.jsonc"]) {
                 const source = path.join(dir, file)
                 log.debug(`loading config from ${source}`)
                 merge(source, yield* loadFile(source))
@@ -1411,8 +1411,8 @@ export namespace Config {
           }
 
           if (existsSync(managedDir)) {
-            // openstudy.json takes priority; opencode.json is legacy fallback
-            for (const file of ["openstudy.json", "openstudy.jsonc", "opencode.json", "opencode.jsonc"]) {
+            // opencode.json loaded first (legacy), openstudy.json loaded last so it wins
+            for (const file of ["opencode.json", "opencode.jsonc", "openstudy.json", "openstudy.jsonc"]) {
               const source = path.join(managedDir, file)
               merge(source, yield* loadFile(source), "global")
             }
