@@ -162,7 +162,7 @@ export const McpAuthCommand = cmd({
 
         if (oauthServers.length === 0) {
           prompts.log.warn("No OAuth-capable MCP servers configured")
-          prompts.log.info("Remote MCP servers support OAuth by default. Add a remote server in study.json:")
+          prompts.log.info("Remote MCP servers support OAuth by default. Add a remote server in openstudy.json:")
           prompts.log.info(`
   "mcp": {
     "my-server": {
