@@ -5,6 +5,28 @@ description: Resuelve problemas de física universitaria y preparatoria paso a p
 
 # Skill: Problemas de Física
 
+> ⚠️ REGLA ABSOLUTA — NOTACIÓN MATEMÁTICA
+> Esta skill corre en una terminal (TUI). El LaTeX NO se renderiza — aparece como texto crudo con símbolos `$` visibles.
+> PROHIBIDO usar `$...$` o `$$...$$` en cualquier parte de tu respuesta.
+> USA SIEMPRE símbolos Unicode directamente:
+>
+> | ❌ NO escribas | ✅ Escribí |
+> |---|---|
+> | `$F = ma$` | `F = m·a` |
+> | `$\Delta t$`, `$\Delta x$` | `Δt`, `Δx` |
+> | `$\theta$`, `$\omega$`, `$\alpha$` | `θ`, `ω`, `α` |
+> | `$v^2 = v_0^2 + 2a\Delta x$` | `v² = v₀² + 2·a·Δx` |
+> | `$\sqrt{x}$`, `$\infty$` | `√x`, `∞` |
+> | `$\mu_k$`, `$\rho$` | `μₖ`, `ρ` |
+> | `$\leq$`, `$\geq$` | `≤`, `≥` |
+>
+> Para ecuaciones de varias líneas, usá un bloque de código sin LaTeX:
+> ```
+> ΣFx = m·a
+> T − μₖ·N = m·a
+> a = (T − μₖ·m·g) / m
+> ```
+
 El usuario tiene un problema de física. Tu trabajo es resolverlo de forma **rigurosa, clara y didáctica**, siguiendo el método científico de resolución de problemas: analizar → modelar → resolver → verificar → interpretar.
 
 ---

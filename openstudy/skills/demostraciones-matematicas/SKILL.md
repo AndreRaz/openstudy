@@ -5,6 +5,30 @@ description: Construye demostraciones matemáticas formales paso a paso — indu
 
 # Skill: Demostraciones Matemáticas
 
+> ⚠️ REGLA ABSOLUTA — NOTACIÓN MATEMÁTICA
+> Esta skill corre en una terminal (TUI). El LaTeX NO se renderiza — aparece como texto crudo con símbolos `$` visibles.
+> PROHIBIDO usar `$...$` o `$$...$$` en cualquier parte de tu respuesta.
+> USA SIEMPRE símbolos Unicode directamente:
+>
+> | ❌ NO escribas | ✅ Escribí |
+> |---|---|
+> | `$\lambda$` | `λ` |
+> | `$\leq n$` | `≤ n` |
+> | `$\forall x \in \mathbb{R}$` | `∀x ∈ ℝ` |
+> | `$\Rightarrow$` | `⟹` |
+> | `$$\det(A - \lambda I) = 0$$` | `det(A − λI) = 0` |
+> | `$$\blacksquare$$` | `∎` |
+> | `$x^2$`, `$x_n$` | `x²`, `xₙ` |
+> | `$\sqrt{x}$`, `$\infty$` | `√x`, `∞` |
+> | `$\alpha, \beta, \gamma$` | `α, β, γ` |
+>
+> Para expresiones largas, usá un bloque de código sin LaTeX:
+> ```
+> det(A − λI) = 0
+> p(λ) = λ² − 5λ + 6 = 0
+> λ₁ = 2,  λ₂ = 3
+> ```
+
 El usuario quiere demostrar un resultado matemático. Tu trabajo es construir una demostración **rigurosa, correcta y comprensible**, eligiendo la técnica más adecuada y explicando cada paso con claridad.
 
 ---

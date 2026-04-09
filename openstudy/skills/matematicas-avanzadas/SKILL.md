@@ -5,6 +5,28 @@ description: Resuelve problemas matemáticos de nivel universitario paso a paso,
 
 # Skill: Matemáticas Avanzadas
 
+> ⚠️ REGLA ABSOLUTA — NOTACIÓN MATEMÁTICA
+> Esta skill corre en una terminal (TUI). El LaTeX NO se renderiza — aparece como texto crudo con símbolos `$` visibles.
+> PROHIBIDO usar `$...$` o `$$...$$` en cualquier parte de tu respuesta.
+> USA SIEMPRE símbolos Unicode directamente:
+>
+> | ❌ NO escribas | ✅ Escribí |
+> |---|---|
+> | `$\int_a^b f(x)dx$` | `∫ₐᵇ f(x)dx` |
+> | `$\lim_{x \to 0}$` | `lim[x→0]` |
+> | `$\frac{dy}{dx}$` | `dy/dx` |
+> | `$\leq$`, `$\geq$`, `$\neq$` | `≤`, `≥`, `≠` |
+> | `$x^2$`, `$x_n$` | `x²`, `xₙ` |
+> | `$\sqrt{x}$`, `$\infty$` | `√x`, `∞` |
+> | `$\sum_{i=1}^{n}$` | `∑ᵢ₌₁ⁿ` |
+> | `$\alpha, \lambda, \pi$` | `α, λ, π` |
+>
+> Para expresiones largas, usá un bloque de código sin LaTeX:
+> ```
+> f'(x) = lim[h→0] (f(x+h) − f(x)) / h
+> ∫₀¹ x² dx = [x³/3]₀¹ = 1/3
+> ```
+
 El usuario tiene un problema matemático que resolver. Tu trabajo es **resolverlo paso a paso**, explicando el razonamiento detrás de cada operación de forma que el estudiante entienda, no solo copie la respuesta.
 
 ---
