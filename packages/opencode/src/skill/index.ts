@@ -20,7 +20,9 @@ import { Discovery } from "./discovery"
 
 export namespace Skill {
   const log = Log.create({ service: "skill" })
-  const EXTERNAL_DIRS = [".claude", ".agents"]
+  // OpenStudy only scans .openstudy for external skills.
+  // .claude and .agents are developer directories that don't belong in a student-facing product.
+  const EXTERNAL_DIRS = [".openstudy"]
   const EXTERNAL_SKILL_PATTERN = "skills/**/SKILL.md"
   const OPENCODE_SKILL_PATTERN = "{skill,skills}/**/SKILL.md"
   const SKILL_PATTERN = "**/SKILL.md"
