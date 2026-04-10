@@ -14,9 +14,15 @@ import PROMPT_EXPLORE from "./prompt/explore.txt"
 import PROMPT_SUMMARY from "./prompt/summary.txt"
 import PROMPT_TITLE from "./prompt/title.txt"
 import PROMPT_NEUX_PROFESOR from "./prompt/neux-profesor.txt"
-import PROMPT_NEUX_TUTOR from "./prompt/neux-tutor.txt"
-import PROMPT_NEUX_INVESTIGADOR from "./prompt/neux-investigador.txt"
-import PROMPT_NEUX_EXPLORADOR from "./prompt/neux-explorador.txt"
+import PROMPT_NEUX_AMODEI from "./prompt/neux-amodei.txt"
+import PROMPT_NEUX_RESEARCHER from "./prompt/neux-researcher.txt"
+import PROMPT_NEUX_WRITER from "./prompt/neux-writer.txt"
+import PROMPT_NEUX_DOC_CREATOR from "./prompt/neux-doc-creator.txt"
+import PROMPT_NEUX_FACT_CHECKER from "./prompt/neux-fact-checker.txt"
+import PROMPT_NEUX_SYNTHESIZER from "./prompt/neux-synthesizer.txt"
+import PROMPT_NEUX_EXPLORER from "./prompt/neux-explorer.txt"
+import PROMPT_NEUX_MATH_SOLVER from "./prompt/neux-math-solver.txt"
+import PROMPT_NEUX_PHYSICS_SOLVER from "./prompt/neux-physics-solver.txt"
 import { Permission } from "@/permission"
 import { mergeDeep, pipe, sortBy, values } from "remeda"
 import { Global } from "@/global"
@@ -226,7 +232,7 @@ export namespace Agent {
             },
             "neux-profesor": {
               name: "neux-profesor",
-              description: "Neux Profesor — AI-powered academic professor that generates study materials, tutors concepts, and creates practice exams.",
+              description: "Neux Profesor — Socratic orchestrator that delegates all academic work to specialized subagents. Questions the student, verifies understanding, and never executes tasks directly.",
               prompt: PROMPT_NEUX_PROFESOR,
               color: "#7C3AED",
               temperature: 0.4,
@@ -237,54 +243,34 @@ export namespace Agent {
               permission: Permission.merge(
                 defaults,
                 Permission.fromConfig({
-                  edit: "ask",
-                  bash: {
-                    "*": "deny",
-                    "open *": "allow",
-                    "ls *": "allow",
-                    "find *": "allow",
-                    "cat *": "allow",
-                    "grep *": "allow",
-                    "mkdir *": "allow",
-                    "zip *": "allow",
-                    "printf *": "allow",
-                    "rm -rf /tmp/docx_build*": "allow",
-                    "dot *": "allow",
-                  },
+                  edit: "deny",
+                  write: "deny",
+                  apply_patch: "deny",
+                  multiedit: "deny",
+                  bash: { "*": "deny" },
+                  webfetch: "deny",
+                  websearch: "deny",
                 }),
                 user,
               ),
             },
-            "neux-tutor": {
-              name: "neux-tutor",
-              description: "Neux Tutor — evaluates academic work, provides structured feedback, diagnoses knowledge gaps. Read-only.",
-              prompt: PROMPT_NEUX_TUTOR,
-              color: "#0891B2",
-              temperature: 0.2,
+            "neux-amodei": {
+              name: "neux-amodei",
+              description: "Neux Amodei — generalist agent that resolves simple tasks directly without delegation. Warns the student to use Neux-Profesor for complex multi-step work.",
+              prompt: PROMPT_NEUX_AMODEI,
+              color: "#F59E0B",
+              temperature: 0.5,
               model: Provider.parseModel("anthropic/claude-sonnet-4-20250514"),
               options: {},
               mode: "primary",
               native: true,
-              permission: Permission.merge(
-                defaults,
-                Permission.fromConfig({
-                  edit: "deny",
-                  bash: {
-                    "*": "deny",
-                    "ls *": "allow",
-                    "find *": "allow",
-                    "cat *": "allow",
-                    "grep *": "allow",
-                  },
-                  webfetch: "allow",
-                }),
-                user,
-              ),
+              permission: Permission.merge(defaults, user),
             },
-            "neux-investigador": {
-              name: "neux-investigador",
-              description: "Neux Investigador — deep multi-source academic research with structured bibliography and critical analysis.",
-              prompt: PROMPT_NEUX_INVESTIGADOR,
+            "neux-researcher": {
+              name: "neux-researcher",
+              description: "Neux Researcher — deep multi-source academic research with structured bibliography and critical analysis. Invoked by primary agents only.",
+              prompt: PROMPT_NEUX_RESEARCHER,
+              color: "#0891B2",
               temperature: 0.3,
               model: Provider.parseModel("anthropic/claude-sonnet-4-20250514"),
               options: {},
@@ -294,21 +280,76 @@ export namespace Agent {
                 defaults,
                 Permission.fromConfig({
                   edit: "deny",
+                  write: "deny",
+                  apply_patch: "deny",
+                  multiedit: "deny",
                   bash: {
                     "*": "deny",
                     "curl *": "allow",
                   },
-                  webfetch: "allow",
+                  task: { "*": "deny" },
                 }),
                 user,
               ),
             },
-            "neux-explorador": {
-              name: "neux-explorador",
-              description: "Neux Explorador — navigates study files and materials in read-only mode. Cannot modify anything.",
-              prompt: PROMPT_NEUX_EXPLORADOR,
+            "neux-writer": {
+              name: "neux-writer",
+              description: "Neux Writer — long-form academic writing (essays, reports, study plans). Loads redaccion-academica and plan-estudio skills.",
+              prompt: PROMPT_NEUX_WRITER,
+              color: "#8B5CF6",
+              temperature: 0.4,
+              model: Provider.parseModel("anthropic/claude-sonnet-4-20250514"),
+              options: {},
+              mode: "subagent",
+              native: true,
+              permission: Permission.merge(
+                defaults,
+                Permission.fromConfig({
+                  bash: { "*": "deny" },
+                  webfetch: "deny",
+                  websearch: "deny",
+                  task: { "*": "deny" },
+                }),
+                user,
+              ),
+            },
+            "neux-doc-creator": {
+              name: "neux-doc-creator",
+              description: "Neux Doc Creator — generates Word, LaTeX, and Graphviz documents. Always loads the crear-documentos skill first.",
+              prompt: PROMPT_NEUX_DOC_CREATOR,
               color: "#10B981",
-              temperature: 0.3,
+              temperature: 0.2,
+              model: Provider.parseModel("anthropic/claude-sonnet-4-20250514"),
+              options: {},
+              mode: "subagent",
+              native: true,
+              permission: Permission.merge(
+                defaults,
+                Permission.fromConfig({
+                  bash: {
+                    "*": "deny",
+                    "mkdir *": "allow",
+                    "zip *": "allow",
+                    "printf *": "allow",
+                    "dot *": "allow",
+                    "rm -rf /tmp/docx_build*": "allow",
+                    "ls *": "allow",
+                    "find *": "allow",
+                    "cat *": "allow",
+                  },
+                  webfetch: "deny",
+                  websearch: "deny",
+                  task: { "*": "deny" },
+                }),
+                user,
+              ),
+            },
+            "neux-fact-checker": {
+              name: "neux-fact-checker",
+              description: "Neux Fact Checker — verifies citations, sources, and factual claims against multiple independent reliable sources.",
+              prompt: PROMPT_NEUX_FACT_CHECKER,
+              color: "#EF4444",
+              temperature: 0.2,
               model: Provider.parseModel("anthropic/claude-sonnet-4-20250514"),
               options: {},
               mode: "subagent",
@@ -317,6 +358,56 @@ export namespace Agent {
                 defaults,
                 Permission.fromConfig({
                   edit: "deny",
+                  write: "deny",
+                  apply_patch: "deny",
+                  multiedit: "deny",
+                  bash: {
+                    "*": "deny",
+                    "curl *": "allow",
+                  },
+                  task: { "*": "deny" },
+                }),
+                user,
+              ),
+            },
+            "neux-synthesizer": {
+              name: "neux-synthesizer",
+              description: "Neux Synthesizer — transforms material into summaries, flashcards, and concept maps. Loads resumen and flashcards skills.",
+              prompt: PROMPT_NEUX_SYNTHESIZER,
+              color: "#F472B6",
+              temperature: 0.3,
+              model: Provider.parseModel("anthropic/claude-sonnet-4-20250514"),
+              options: {},
+              mode: "subagent",
+              native: true,
+              permission: Permission.merge(
+                defaults,
+                Permission.fromConfig({
+                  bash: { "*": "deny" },
+                  webfetch: "deny",
+                  websearch: "deny",
+                  task: { "*": "deny" },
+                }),
+                user,
+              ),
+            },
+            "neux-explorer": {
+              name: "neux-explorer",
+              description: "Neux Explorer — read-only navigation of the student's local study files. Cannot modify anything.",
+              prompt: PROMPT_NEUX_EXPLORER,
+              color: "#3B82F6",
+              temperature: 0.2,
+              model: Provider.parseModel("anthropic/claude-sonnet-4-20250514"),
+              options: {},
+              mode: "subagent",
+              native: true,
+              permission: Permission.merge(
+                defaults,
+                Permission.fromConfig({
+                  edit: "deny",
+                  write: "deny",
+                  apply_patch: "deny",
+                  multiedit: "deny",
                   bash: {
                     "*": "deny",
                     "ls *": "allow",
@@ -324,6 +415,51 @@ export namespace Agent {
                     "cat *": "allow",
                     "grep *": "allow",
                   },
+                  webfetch: "deny",
+                  websearch: "deny",
+                  task: { "*": "deny" },
+                }),
+                user,
+              ),
+            },
+            "neux-math-solver": {
+              name: "neux-math-solver",
+              description: "Neux Math Solver — solves math problems and produces step-by-step proofs. Loads matematicas-avanzadas and demostraciones-matematicas skills.",
+              prompt: PROMPT_NEUX_MATH_SOLVER,
+              color: "#6366F1",
+              temperature: 0.2,
+              model: Provider.parseModel("anthropic/claude-sonnet-4-20250514"),
+              options: {},
+              mode: "subagent",
+              native: true,
+              permission: Permission.merge(
+                defaults,
+                Permission.fromConfig({
+                  bash: { "*": "deny" },
+                  webfetch: "deny",
+                  websearch: "deny",
+                  task: { "*": "deny" },
+                }),
+                user,
+              ),
+            },
+            "neux-physics-solver": {
+              name: "neux-physics-solver",
+              description: "Neux Physics Solver — solves physics problems with rigorous step-by-step derivation, unit tracking, and physical sanity checks. Loads fisica-problemas skill.",
+              prompt: PROMPT_NEUX_PHYSICS_SOLVER,
+              color: "#14B8A6",
+              temperature: 0.2,
+              model: Provider.parseModel("anthropic/claude-sonnet-4-20250514"),
+              options: {},
+              mode: "subagent",
+              native: true,
+              permission: Permission.merge(
+                defaults,
+                Permission.fromConfig({
+                  bash: { "*": "deny" },
+                  webfetch: "deny",
+                  websearch: "deny",
+                  task: { "*": "deny" },
                 }),
                 user,
               ),
