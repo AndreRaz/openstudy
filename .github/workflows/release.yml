@@ -93,25 +93,11 @@ jobs:
 
           & "$binDir\setup-openstudy.ps1"
 
-          $agentsDir = Join-Path $testHome '.config\opencode\agents'
           $skillsDir = Join-Path $testHome '.config\opencode\skills'
           $configPath = Join-Path $testHome '.config\opencode\opencode.json'
 
-          $requiredAgents = @(
-            'neux-profesor.md',
-            'neux-tutor.md',
-            'neux-investigador.md',
-            'neux-explorador.md'
-          )
-
-          foreach ($agent in $requiredAgents) {
-            if (-not (Test-Path (Join-Path $agentsDir $agent))) {
-              throw "Falta el agente instalado: $agent"
-            }
-          }
-
-          if (-not (Test-Path (Join-Path $skillsDir 'estudio-explorar\SKILL.md'))) {
-            throw 'Falta la skill estudio-explorar en el directorio configurado'
+          if (-not (Test-Path (Join-Path $skillsDir 'resumen\SKILL.md'))) {
+            throw 'Falta la skill resumen en el directorio configurado'
           }
 
           if (-not (Test-Path $configPath)) {
@@ -119,9 +105,6 @@ jobs:
           }
 
           $config = Get-Content -Raw $configPath | ConvertFrom-Json
-          if (-not $config.agent.'neux-profesor') {
-            throw 'opencode.json no incluye neux-profesor'
-          }
           if (-not $config.mcp.engram) {
             throw 'opencode.json no incluye la configuracion de engram'
           }

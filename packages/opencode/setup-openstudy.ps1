@@ -10,7 +10,6 @@ $homeDir = if ($env:HOME) {
 
 $configHome = if ($env:XDG_CONFIG_HOME) { $env:XDG_CONFIG_HOME } else { Join-Path $homeDir '.config' }
 $configDir = Join-Path $configHome 'openstudy'
-$agentsDir = Join-Path $configDir 'agents'
 $skillsDir = Join-Path $configDir 'skills'
 
 # Resolve script directory so we can find the bundled skills/ folder
@@ -36,7 +35,7 @@ if ($engramCmd) {
 $engramBinJson = $engramBin.Replace('\', '/')
 
 Write-Host 'OpenStudy - Configurando agentes academicos...' -ForegroundColor Cyan
-New-Item -ItemType Directory -Force -Path $agentsDir | Out-Null
+New-Item -ItemType Directory -Force -Path $configDir | Out-Null
 
 function ConvertTo-HashtableCompat {
   param([Parameter(ValueFromPipeline = $true)] $InputObject)
@@ -111,67 +110,6 @@ function Get-DefaultConfigJson {
 {
   "`$schema": "https://opencode.ai/config.json",
   "plugin": ["opencode-anthropic-login-via-cli@latest"],
-  "agent": {
-    "neux-profesor": {
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.4,
-      "color": "#7C3AED",
-      "permission": {
-        "edit": "ask",
-        "bash": {
-          "*": "deny",
-          "open *": "allow",
-          "ls *": "allow",
-          "find *": "allow",
-          "cat *": "allow",
-          "grep *": "allow"
-        }
-      }
-    },
-    "neux-tutor": {
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.2,
-      "color": "#0891B2",
-      "permission": {
-        "edit": "deny",
-        "bash": {
-          "*": "deny",
-          "ls *": "allow",
-          "find *": "allow",
-          "cat *": "allow",
-          "grep *": "allow"
-        },
-        "webfetch": "allow"
-      }
-    },
-    "neux-investigador": {
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.3,
-      "permission": {
-        "edit": "deny",
-        "bash": {
-          "*": "deny",
-          "curl *": "allow"
-        },
-        "webfetch": "allow"
-      }
-    },
-    "neux-explorador": {
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.3,
-      "color": "#10B981",
-      "permission": {
-        "edit": "deny",
-        "bash": {
-          "*": "deny",
-          "ls *": "allow",
-          "find *": "allow",
-          "cat *": "allow",
-          "grep *": "allow"
-        }
-      }
-    }
-  },
   "mcp": {
     "filesystem": {
       "type": "local",
@@ -256,19 +194,13 @@ function Write-OrMergeConfig {
     }
   }
 
-  foreach ($section in @('agent', 'mcp')) {
-    if (-not $currentConfig.ContainsKey($section) -or $currentConfig[$section] -isnot [hashtable]) {
-      $currentConfig[$section] = @{}
-    }
-    if ($section -eq 'mcp') {
-      # Always overwrite MCP entries so commands stay correct after upgrades.
-      # Users don't customize MCP commands - this section is managed by OpenStudy.
-      foreach ($key in $defaultConfig[$section].Keys) {
-        $currentConfig[$section][$key] = $defaultConfig[$section][$key]
-      }
-    } else {
-      Merge-Hashtable -Target $currentConfig[$section] -Defaults $defaultConfig[$section]
-    }
+  # Always overwrite MCP entries so commands stay correct after upgrades.
+  # Users don't customize MCP commands - this section is managed by OpenStudy.
+  if (-not $currentConfig.ContainsKey('mcp') -or $currentConfig['mcp'] -isnot [hashtable]) {
+    $currentConfig['mcp'] = @{}
+  }
+  foreach ($key in $defaultConfig['mcp'].Keys) {
+    $currentConfig['mcp'][$key] = $defaultConfig['mcp'][$key]
   }
 
   $currentConfig | ConvertTo-Json -Depth 20 | Set-Content -Encoding UTF8 $Path

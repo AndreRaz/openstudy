@@ -2,7 +2,6 @@
 set -euo pipefail
 
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/openstudy"
-AGENTS_DIR="$CONFIG_DIR/agents"
 SKILLS_DIR="$CONFIG_DIR/skills"
 
 # Resolve the directory where this script lives (used to find bundled skills/)
@@ -21,7 +20,7 @@ fi
 ENGRAM_BIN="${ENGRAM_BIN:-engram}"  # fallback to PATH-based lookup at runtime
 
 echo "🎓 OpenStudy — Configurando agentes académicos..."
-mkdir -p "$AGENTS_DIR"
+mkdir -p "$CONFIG_DIR"
 
 install_if_missing() {
   local file="$1"
@@ -60,67 +59,6 @@ get_default_config_json() {
 {
   "\$schema": "https://opencode.ai/config.json",
   "plugin": ["opencode-anthropic-login-via-cli@latest"],
-  "agent": {
-    "neux-profesor": {
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.4,
-      "color": "#7C3AED",
-      "permission": {
-        "edit": "ask",
-        "bash": {
-          "*": "deny",
-          "open *": "allow",
-          "ls *": "allow",
-          "find *": "allow",
-          "cat *": "allow",
-          "grep *": "allow"
-        }
-      }
-    },
-    "neux-tutor": {
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.2,
-      "color": "#0891B2",
-      "permission": {
-        "edit": "deny",
-        "bash": {
-          "*": "deny",
-          "ls *": "allow",
-          "find *": "allow",
-          "cat *": "allow",
-          "grep *": "allow"
-        },
-        "webfetch": "allow"
-      }
-    },
-    "neux-investigador": {
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.3,
-      "permission": {
-        "edit": "deny",
-        "bash": {
-          "*": "deny",
-          "curl *": "allow"
-        },
-        "webfetch": "allow"
-      }
-    },
-    "neux-explorador": {
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.3,
-      "color": "#10B981",
-      "permission": {
-        "edit": "deny",
-        "bash": {
-          "*": "deny",
-          "ls *": "allow",
-          "find *": "allow",
-          "cat *": "allow",
-          "grep *": "allow"
-        }
-      }
-    }
-  },
   "mcp": {
     "filesystem": {
       "type": "local",
@@ -175,67 +113,6 @@ engram_bin = sys.argv[2]
 defaults = {
     "$schema": "https://opencode.ai/config.json",
     "plugin": ["opencode-anthropic-login-via-cli@latest"],
-    "agent": {
-        "neux-profesor": {
-            "model": "anthropic/claude-sonnet-4-20250514",
-            "temperature": 0.4,
-            "color": "#7C3AED",
-            "permission": {
-                "edit": "ask",
-                "bash": {
-                    "*": "deny",
-                    "open *": "allow",
-                    "ls *": "allow",
-                    "find *": "allow",
-                    "cat *": "allow",
-                    "grep *": "allow",
-                },
-            },
-        },
-        "neux-tutor": {
-            "model": "anthropic/claude-sonnet-4-20250514",
-            "temperature": 0.2,
-            "color": "#0891B2",
-            "permission": {
-                "edit": "deny",
-                "bash": {
-                    "*": "deny",
-                    "ls *": "allow",
-                    "find *": "allow",
-                    "cat *": "allow",
-                    "grep *": "allow",
-                },
-                "webfetch": "allow",
-            },
-        },
-        "neux-investigador": {
-            "model": "anthropic/claude-sonnet-4-20250514",
-            "temperature": 0.3,
-            "permission": {
-                "edit": "deny",
-                "bash": {
-                    "*": "deny",
-                    "curl *": "allow",
-                },
-                "webfetch": "allow",
-            },
-        },
-        "neux-explorador": {
-            "model": "anthropic/claude-sonnet-4-20250514",
-            "temperature": 0.3,
-            "color": "#10B981",
-            "permission": {
-                "edit": "deny",
-                "bash": {
-                    "*": "deny",
-                    "ls *": "allow",
-                    "find *": "allow",
-                    "cat *": "allow",
-                    "grep *": "allow",
-                },
-            },
-        },
-    },
     "mcp": {
         "filesystem": {
             "type": "local",
@@ -290,16 +167,12 @@ for plugin in defaults["plugin"]:
         plugins.append(plugin)
 current["plugin"] = plugins
 
-for section in ("agent", "mcp"):
-    if not isinstance(current.get(section), dict):
-        current[section] = {}
-    if section == "mcp":
-        # Always overwrite MCP entries so commands stay correct after upgrades.
-        # Users don't customize MCP commands — this section is managed by OpenStudy.
-        for key, value in defaults[section].items():
-            current[section][key] = value
-    else:
-        merge_missing(current[section], defaults[section])
+# Always overwrite MCP entries so commands stay correct after upgrades.
+# Users don't customize MCP commands — this section is managed by OpenStudy.
+if not isinstance(current.get("mcp"), dict):
+    current["mcp"] = {}
+for key, value in defaults["mcp"].items():
+    current["mcp"][key] = value
 
 json.dump(current, sys.stdout, indent=2, ensure_ascii=False)
 sys.stdout.write("\n")
